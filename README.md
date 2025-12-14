@@ -4,7 +4,7 @@
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.10.3+-blue.svg)](https://flutter.dev/)
 [![Firebase](https://img.shields.io/badge/Firebase-Enabled-orange.svg)](https://firebase.google.com/)
-[![Gemini AI](https://img.shields.io/badge/Gemini-AI%20Chatbot-green.svg)](https://ai.google.dev/)
+[![Groq AI](https://img.shields.io/badge/Groq-Llama%203.1-green.svg)](https://groq.com/)
 
 ---
 
@@ -74,7 +74,7 @@ graduation-project/
 - **Cloud Functions** - Serverless functions
 
 ### AI & Tools
-- **Gemini AI** - Chatbot thông minh hỗ trợ người dùng
+- **Groq API** - Sử dụng model **Llama 3.1 8B** cho chatbot thông minh (miễn phí, tốc độ cao)
 - **Image Picker** - Chọn/chụp ảnh từ thiết bị
 - **URL Launcher** - Mở bản đồ và liên kết ngoài
 
@@ -109,10 +109,11 @@ graduation-project/
 
 4. **Cấu hình biến môi trường**
    - Tạo file `.env` trong thư mục `green_recycle_app`
-   - Thêm API key cho Gemini (nếu cần):
+   - Thêm API key cho Groq:
      ```
-     GEMINI_API_KEY=your_api_key_here
+     GROQ_API_KEY=your_api_key_here
      ```
+   - Đăng ký API key miễn phí tại [console.groq.com](https://console.groq.com/)
 
 5. **Chạy ứng dụng**
    ```bash
@@ -159,9 +160,9 @@ Dự án này được phát triển cho mục đích tốt nghiệp.
 
 ## 👥 Tác giả
 
-- **Sinh viên thực hiện**: [Tên sinh viên]
-- **Giảng viên hướng dẫn**: [Tên giảng viên]
-- **Trường**: [Tên trường]
+- **Sinh viên thực hiện**: [Nguyễn Khánh Linh]
+- **Giảng viên hướng dẫn**: [Thái Văn Hòa]
+- **Trường**: [ĐỜI]
 
 ---
 
