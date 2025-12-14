@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WasteScan Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&amp;family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f9f506",
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#23220f",
+                        "text-main": "#181811",
+                        "text-subtle": "#8c8b5f",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display antialiased">
+<div class="relative flex h-full min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-hidden transition-colors duration-200">
+<!-- Top Bar -->
+<div class="flex items-center p-4 justify-end z-10">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+<p class="text-text-subtle dark:text-[#bebd95] text-base font-bold leading-normal tracking-[0.015em]">Bỏ qua</p>
+</button>
+</div>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto px-6">
+<!-- Illustration -->
+<div class="w-full relative aspect-square max-h-[380px] mb-8">
+<div class="absolute inset-0 bg-white/40 dark:bg-white/5 rounded-full blur-3xl transform scale-90"></div>
+<div class="w-full h-full bg-center bg-contain bg-no-repeat z-10 relative rounded-xl transition-all duration-500 hover:scale-[1.02]" data-alt="3D illustration of a smartphone scanning a plastic bottle with a green recycling checkmark badge popping out" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCzbCCuOIHj1-oz8y2P4oC_OwXP5N1Td43iVq6YqIPcQyN_61U7gLEz4AXCoKvN2MK8Cm52demOkcspJ7WO0yRlE-ck278NO1orKy0tqjZwPNlPwUOGIQDTi6dwoJVjnsWCOQf_B7moYWiJqJa1IQhuAUP05tr3J1cbBJ29t5fv1wFql3wJI5_TtH3QKKQ62o-60-UHHA5ZQ-2PT2HCJYP703L8YtGyQHrvZhQLBv0TcLHbAJl0m2dEkpCkgghGa83gk_ZTTsUx30A");'></div>
+</div>
+<!-- Text Content -->
+<div class="flex flex-col items-center text-center space-y-4 mb-8">
+<h1 class="text-text-main dark:text-white text-3xl sm:text-4xl font-bold leading-tight tracking-tight">
+                Phân loại rác chuẩn xác
+            </h1>
+<p class="text-text-main/70 dark:text-white/70 text-base sm:text-lg font-normal leading-relaxed max-w-[320px]">
+                Chỉ cần chụp ảnh, WasteScan sẽ cho bạn biết rác này thuộc loại nào và cách xử lý để bảo vệ môi trường.
+            </p>
+</div>
+</div>
+<!-- Footer Controls -->
+<div class="w-full max-w-md mx-auto px-6 pb-10 flex flex-col items-center gap-8">
+<!-- Page Indicators -->
+<div class="flex flex-row items-center justify-center gap-3">
+<div class="h-2.5 w-2.5 rounded-full bg-[#e6e6db] dark:bg-white/20 transition-all duration-300"></div>
+<div class="h-2.5 w-8 rounded-full bg-primary transition-all duration-300 shadow-[0_0_10px_rgba(249,245,6,0.4)]"></div>
+<div class="h-2.5 w-2.5 rounded-full bg-[#e6e6db] dark:bg-white/20 transition-all duration-300"></div>
+</div>
+<!-- Action Button -->
+<button class="w-full h-14 flex items-center justify-center gap-2 bg-primary hover:bg-[#e6e205] text-black rounded-full font-bold text-lg tracking-wide transition-all active:scale-[0.98] shadow-lg shadow-primary/20">
+<span>Tiếp theo</span>
+<span class="material-symbols-outlined text-[20px] font-bold">arrow_forward</span>
+</button>
+</div>
+</div>
+</body></html>

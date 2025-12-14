@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WasteScan - Đăng ký</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f9f506",
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#23220f",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#2d2c1b",
+                        "text-main": "#181811",
+                        "text-light": "#8c8b5f",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar hide for cleaner mobile look */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-main dark:text-gray-100 min-h-screen flex flex-col relative overflow-x-hidden transition-colors duration-300">
+<!-- Subtle Background Pattern -->
+<div class="fixed inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]" data-alt="subtle leaf pattern background texture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuARGySkSZ3lZGnL0f-264lb3DxRI_so8Nz_HdFgcajPuOmBy8PO5MOuCXK6Zu1e1WBrtsAy-rPZ655VyHbuKmFfMJCV4z9szRvTkun8XyTPRQSX92yq1ma4riRQWYWvX2Ul3MzWqdDo42NOh1VKTJp340MkTBO28EfCwh94bhFhC8VBKMzs7bPoB4tpZLUz-7949GVgHLjr695mBAZDuHODUdkeEbZcAkXPpGwWwxmysT-a57GRwmNaQwMg5CClTDZ1LRz_tTARk2U');">
+</div>
+<!-- Top Navigation -->
+<div class="fixed top-0 left-0 right-0 z-50 px-4 py-2 flex items-center justify-between">
+<button class="flex items-center justify-center w-12 h-12 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-2xl" data-icon="arrow_back">arrow_back</span>
+</button>
+</div>
+<!-- Main Content - Pushed down for one-handed use -->
+<main class="flex-grow flex flex-col px-6 pb-8 pt-20 justify-end w-full max-w-md mx-auto">
+<!-- Top Spacer to push content down -->
+<div class="flex-1 min-h-[10vh]"></div>
+<!-- Header Section -->
+<div class="mb-8">
+<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-primary/20 rotate-3">
+<span class="material-symbols-outlined text-4xl text-black">recycling</span>
+</div>
+<h1 class="text-4xl font-bold tracking-tight text-text-main dark:text-white mb-2">Đăng ký</h1>
+<p class="text-text-light dark:text-gray-400 text-lg">Tạo tài khoản WasteScan mới</p>
+</div>
+<!-- Form Section -->
+<form class="flex flex-col gap-4">
+<!-- Name Input -->
+<div class="group">
+<label class="sr-only">Tên hiển thị</label>
+<div class="relative flex items-center">
+<div class="absolute left-5 text-text-light dark:text-gray-500">
+<span class="material-symbols-outlined text-[20px]">person</span>
+</div>
+<input class="w-full bg-surface-light dark:bg-surface-dark border-0 ring-1 ring-gray-200 dark:ring-gray-700 rounded-full py-4 pl-12 pr-5 text-base placeholder:text-text-light/70 focus:ring-2 focus:ring-primary focus:outline-none transition-all shadow-sm h-14" placeholder="Tên hiển thị" type="text"/>
+</div>
+</div>
+<!-- Email/Phone Input -->
+<div class="group">
+<label class="sr-only">Email hoặc SĐT</label>
+<div class="relative flex items-center">
+<div class="absolute left-5 text-text-light dark:text-gray-500">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+</div>
+<input class="w-full bg-surface-light dark:bg-surface-dark border-0 ring-1 ring-gray-200 dark:ring-gray-700 rounded-full py-4 pl-12 pr-5 text-base placeholder:text-text-light/70 focus:ring-2 focus:ring-primary focus:outline-none transition-all shadow-sm h-14" placeholder="Email hoặc SĐT" type="text"/>
+</div>
+</div>
+<!-- Password Input -->
+<div class="group">
+<label class="sr-only">Mật khẩu</label>
+<div class="relative flex items-center">
+<div class="absolute left-5 text-text-light dark:text-gray-500">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+</div>
+<input class="w-full bg-surface-light dark:bg-surface-dark border-0 ring-1 ring-gray-200 dark:ring-gray-700 rounded-full py-4 pl-12 pr-12 text-base placeholder:text-text-light/70 focus:ring-2 focus:ring-primary focus:outline-none transition-all shadow-sm h-14" placeholder="Mật khẩu" type="password"/>
+<button class="absolute right-5 text-text-light dark:text-gray-500 hover:text-text-main dark:hover:text-white transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Confirm Password Input -->
+<div class="group">
+<label class="sr-only">Xác nhận mật khẩu</label>
+<div class="relative flex items-center">
+<div class="absolute left-5 text-text-light dark:text-gray-500">
+<span class="material-symbols-outlined text-[20px]">lock_reset</span>
+</div>
+<input class="w-full bg-surface-light dark:bg-surface-dark border-0 ring-1 ring-gray-200 dark:ring-gray-700 rounded-full py-4 pl-12 pr-12 text-base placeholder:text-text-light/70 focus:ring-2 focus:ring-primary focus:outline-none transition-all shadow-sm h-14" placeholder="Nhập lại mật khẩu" type="password"/>
+</div>
+</div>
+<!-- Terms Text -->
+<p class="text-xs text-text-light dark:text-gray-500 px-4 text-center mt-2 leading-relaxed">
+                Bằng việc đăng ký, bạn đồng ý với <a class="underline decoration-primary decoration-2 underline-offset-2 text-text-main dark:text-gray-300" href="#">Điều khoản sử dụng</a> và <a class="underline decoration-primary decoration-2 underline-offset-2 text-text-main dark:text-gray-300" href="#">Chính sách bảo mật</a> của chúng tôi.
+            </p>
+<!-- Submit Button -->
+<button class="w-full bg-primary hover:bg-[#ebe705] text-[#181811] font-bold rounded-full py-4 text-lg shadow-lg shadow-primary/25 transform active:scale-[0.98] transition-all mt-2 h-14 flex items-center justify-center gap-2" type="button">
+<span>Tạo tài khoản</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</form>
+<!-- Social Login Section -->
+<div class="mt-8 flex flex-col items-center gap-4">
+<div class="relative w-full flex items-center justify-center">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
+</div>
+<span class="relative bg-background-light dark:bg-background-dark px-4 text-sm text-text-light dark:text-gray-500">Hoặc đăng ký với</span>
+</div>
+<div class="flex gap-4">
+<button aria-label="Sign up with Google" class="flex items-center justify-center w-14 h-14 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<img alt="Google Logo" class="w-6 h-6" data-alt="Google G logo icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBh6pVDLlwvVS0IMrXB_TNepQInzwYpvemG-F35NjBc2PFAX2y2Kl_7osAwWymkS2fPaZTpU7qD3MZeNZg1IK293m0xVwgYoTqS2LktJccnMPMJ2HALeRs5ng_XZz9fET9ew912hvJssS28dFvv0WN0gk_dl44X5AXB9WKrCRKbUQFGvYeDUkALJIy_W3nDInW4_N2SuqjqwMd_mXxud6MyMqFBgzvl3qBcqj1MuiAt8kK2d5odDVGQqnOWehK3E6gVvhLaVWbnEPM"/>
+</button>
+<button aria-label="Sign up with Apple" class="flex items-center justify-center w-14 h-14 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-3xl text-black dark:text-white" data-icon="apple">ios</span>
+</button>
+</div>
+<div class="mt-4">
+<p class="text-text-main dark:text-gray-300 font-medium">
+                    Đã có tài khoản? 
+                    <a class="text-text-main dark:text-white font-bold underline decoration-primary decoration-2 underline-offset-4 hover:opacity-80 transition-opacity" href="#">Đăng nhập</a>
+</p>
+</div>
+</div>
+<!-- Bottom safe area spacing -->
+<div class="h-6"></div>
+</main>
+</body></html>

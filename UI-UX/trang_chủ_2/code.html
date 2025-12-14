@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WasteScan - Điểm Thu Gom</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#f9f506",
+              "primary-dark": "#caca04",
+              "background-light": "#f8f8f5",
+              "background-dark": "#23220f",
+              "surface-light": "#ffffff",
+              "surface-dark": "#2c2b18",
+              "text-main": "#181811",
+              "text-secondary": "#8c8b5f",
+            },
+            fontFamily: {
+              "display": ["Spline Sans", "sans-serif"],
+              "body": ["Noto Sans", "sans-serif"],
+            },
+            borderRadius: {
+              "DEFAULT": "1rem", 
+              "lg": "1.5rem", 
+              "xl": "2rem", 
+              "full": "9999px"
+            },
+            boxShadow: {
+              'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+              'up': '0 -4px 20px -2px rgba(0, 0, 0, 0.1)',
+            }
+          },
+        },
+      }
+    </script>
+<style>.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }.no-scrollbar {
+            -ms-overflow-style: none;scrollbar-width: none;}.pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }@keyframes pulse-ring {
+            0% { transform: scale(0.33); opacity: 0; }
+            50% { opacity: 0.3; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        .pin-pulse::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: -12px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: currentColor;
+            opacity: 0.4;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen text-text-main dark:text-white font-display overflow-hidden selection:bg-primary selection:text-black">
+<header class="bg-background-light dark:bg-background-dark z-30 transition-colors duration-300">
+<div class="flex items-center justify-between px-4 pt-6 pb-2">
+<h1 class="text-2xl font-bold tracking-tight">Điểm thu gom</h1>
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark shadow-sm hover:bg-gray-100 dark:hover:bg-opacity-80 transition-colors relative">
+<span class="material-symbols-outlined text-text-main dark:text-white">tune</span>
+</button>
+<div class="relative group cursor-pointer">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 ring-2 ring-white dark:ring-surface-dark shadow-sm" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBfFTKaog5Yype352Voy17bpqCxliDyRXRFsD01mt1XpC9-qctK713jJJx3P12wZDA5Vt_PIVHTGGfLsknvEQn4B9U55hbkcfHmzfnaqUf8WMa3QMwpyr5cIUay_ILTtrK6Ske0sswAe0OrNwSASkzmrG_zBHvyd8_QaqpkhkU6tBgjX1vEWZcSW7vzWO-wl5YvSq6dzmFFKP8zvuKiol9dfkxEf6HhWHAN8jTNU_8z8DN68VgBfNwHEHeQ6oK-XsoUazJfA3nK62M");'></div>
+</div>
+</div>
+</div>
+<div class="px-4 pb-3">
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-gray-400 group-focus-within:text-primary-dark transition-colors">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 rounded-xl border-none bg-white dark:bg-surface-dark shadow-soft text-sm placeholder-gray-400 focus:ring-2 focus:ring-primary dark:focus:ring-primary/50 transition-all" placeholder="Tìm kiếm địa điểm, khu vực..." type="text"/>
+</div>
+</div>
+<div class="px-4 pb-2 flex flex-col gap-3">
+<div class="w-full p-1 bg-gray-200 dark:bg-surface-dark/50 rounded-xl flex relative">
+<button class="flex-1 py-1.5 rounded-lg bg-white dark:bg-surface-dark shadow-sm text-sm font-bold text-text-main dark:text-white transition-all">Bản đồ</button>
+<button class="flex-1 py-1.5 rounded-lg text-sm font-medium text-text-secondary dark:text-gray-400 hover:text-text-main dark:hover:text-white transition-all">Danh sách</button>
+</div>
+<div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+<button class="flex-none px-4 py-1.5 rounded-full bg-text-main dark:bg-white text-white dark:text-black text-xs font-bold shadow-sm whitespace-nowrap">
+                Tất cả
+            </button>
+<button class="flex-none px-4 py-1.5 rounded-full bg-white dark:bg-surface-dark border border-gray-100 dark:border-white/10 text-text-secondary dark:text-gray-300 text-xs font-medium shadow-sm whitespace-nowrap hover:bg-gray-50 dark:hover:bg-surface-dark/80">
+                Pin &amp; Ắc quy
+            </button>
+<button class="flex-none px-4 py-1.5 rounded-full bg-white dark:bg-surface-dark border border-gray-100 dark:border-white/10 text-text-secondary dark:text-gray-300 text-xs font-medium shadow-sm whitespace-nowrap hover:bg-gray-50 dark:hover:bg-surface-dark/80">
+                Nhựa tái chế
+            </button>
+<button class="flex-none px-4 py-1.5 rounded-full bg-white dark:bg-surface-dark border border-gray-100 dark:border-white/10 text-text-secondary dark:text-gray-300 text-xs font-medium shadow-sm whitespace-nowrap hover:bg-gray-50 dark:hover:bg-surface-dark/80">
+                Giấy bìa
+            </button>
+<button class="flex-none px-4 py-1.5 rounded-full bg-white dark:bg-surface-dark border border-gray-100 dark:border-white/10 text-text-secondary dark:text-gray-300 text-xs font-medium shadow-sm whitespace-nowrap hover:bg-gray-50 dark:hover:bg-surface-dark/80">
+                Thủy tinh
+            </button>
+</div>
+</div>
+</header>
+<main class="flex-1 relative overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] w-full">
+<div class="absolute inset-0 w-full h-full">
+<div class="absolute w-[120%] h-8 bg-white dark:bg-opacity-5 top-1/4 -left-10 rotate-12 shadow-sm dark:shadow-none"></div>
+<div class="absolute w-[120%] h-6 bg-white dark:bg-opacity-5 top-2/3 -left-10 -rotate-6 shadow-sm dark:shadow-none"></div>
+<div class="absolute h-[120%] w-6 bg-white dark:bg-opacity-5 left-1/3 -top-10 rotate-6 shadow-sm dark:shadow-none"></div>
+<div class="absolute h-[120%] w-4 bg-white dark:bg-opacity-5 right-1/4 -top-10 -rotate-3 shadow-sm dark:shadow-none"></div>
+<div class="absolute top-10 right-10 w-48 h-48 bg-green-200/40 dark:bg-green-900/10 rounded-full blur-2xl"></div>
+<div class="absolute bottom-1/3 left-10 w-32 h-32 bg-blue-200/40 dark:bg-blue-900/10 rounded-full blur-2xl"></div>
+<div class="absolute top-1/3 left-10 text-[10px] font-bold text-gray-400 dark:text-white/20 uppercase tracking-widest rotate-12">Đường Nguyễn Trãi</div>
+<div class="absolute bottom-1/4 right-1/3 text-[10px] font-bold text-gray-400 dark:text-white/20 uppercase tracking-widest -rotate-6">Đại lộ Lê Lợi</div>
+</div>
+<button class="absolute top-1/4 right-1/4 transform -translate-x-1/2 -translate-y-1/2 group hover:scale-110 transition-transform focus:outline-none">
+<div class="flex flex-col items-center">
+<div class="bg-white dark:bg-surface-dark px-2 py-1 rounded-md shadow-md text-[10px] font-bold mb-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Trạm Quận 3</div>
+<span class="material-symbols-outlined text-red-500 drop-shadow-md text-4xl filled" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</button>
+<button class="absolute bottom-1/3 left-12 transform -translate-x-1/2 -translate-y-1/2 group hover:scale-110 transition-transform focus:outline-none">
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-green-600 drop-shadow-md text-4xl filled" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</button>
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+<div class="flex flex-col items-center relative text-primary-dark dark:text-primary pin-pulse">
+<span class="material-symbols-outlined text-5xl drop-shadow-lg filled" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<div class="size-2 bg-black/20 rounded-full blur-sm mt-[-4px]"></div>
+</div>
+</div>
+<div class="absolute bottom-48 right-6 size-12 bg-white dark:bg-surface-dark rounded-full shadow-lg flex items-center justify-center text-blue-500 z-10 cursor-pointer hover:bg-gray-50">
+<span class="material-symbols-outlined">my_location</span>
+</div>
+<div class="absolute bottom-[90px] left-4 right-4 z-20">
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-4 shadow-xl border border-white/50 dark:border-white/5 backdrop-blur-sm animate-[slideUp_0.3s_ease-out]">
+<div class="flex gap-4">
+<div class="w-20 h-20 rounded-xl bg-gray-200 overflow-hidden flex-shrink-0 relative">
+<div class="absolute inset-0 bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCubzOEBku2PLbfvqhbyxqjyjaqsx_rw1q6xLI5tsdIQQxnI4OexnUUQj56o3pFXfT9tj440wczPSfrGdM1Btl89IQXPswlEW_z2vXm0msP435WOam0R2Fz7slRL0Uz99RAiZGcQ2pm4tYDVDnDvp4OkD-EA3ryTKebVjzwgWQS-bTUV30_ZnP4aC3IUUPveUTlX-rkReYD_RkxmNLqWwjKzKNTqvyIFupybW15tG6AluTmtNoi6p4aBCO8nGA8ZxhDCXeVYD6us5A");'></div>
+<div class="absolute top-1 right-1 bg-green-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded">Mở cửa</div>
+</div>
+<div class="flex-1 min-w-0 flex flex-col justify-between">
+<div>
+<h3 class="text-lg font-bold text-text-main dark:text-white truncate">Trạm Xanh - Quận 1</h3>
+<p class="text-sm text-text-secondary dark:text-gray-400 truncate">123 Đường Nguyễn Huệ, P. Bến Nghé</p>
+</div>
+<div class="flex items-center gap-1.5 mt-1 overflow-x-auto no-scrollbar">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300">
+<span class="material-symbols-outlined text-[12px]">battery_charging_full</span> Pin
+                        </span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300">
+<span class="material-symbols-outlined text-[12px]">recycling</span> Nhựa
+                        </span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300">
+                            +2
+                        </span>
+</div>
+</div>
+</div>
+<div class="flex gap-3 mt-4">
+<button class="flex-1 h-10 rounded-full bg-primary hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 text-text-main font-bold text-sm shadow-[0_2px_10px_rgba(249,245,6,0.3)]">
+<span class="material-symbols-outlined text-lg">directions</span>
+                    Chỉ đường
+                </button>
+<button class="size-10 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-white/5 transition-colors text-text-secondary dark:text-white">
+<span class="material-symbols-outlined">share</span>
+</button>
+<button class="size-10 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-white/5 transition-colors text-text-secondary dark:text-white">
+<span class="material-symbols-outlined">bookmark_border</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<nav class="fixed bottom-0 left-0 right-0 z-50 pb-safe bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur-lg border-t border-gray-200 dark:border-white/5">
+<div class="flex justify-around items-center h-16 px-2">
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group text-text-secondary dark:text-gray-500 hover:text-primary-dark dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:-translate-y-0.5 transition-transform duration-200">home</span>
+<span class="text-[11px] font-medium">Trang chủ</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group text-text-secondary dark:text-gray-500 hover:text-primary-dark dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:-translate-y-0.5 transition-transform duration-200">center_focus_weak</span>
+<span class="text-[11px] font-medium">Quét</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group text-text-secondary dark:text-gray-500 hover:text-primary-dark dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:-translate-y-0.5 transition-transform duration-200">history</span>
+<span class="text-[11px] font-medium">Lịch sử</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group" href="#">
+<div class="px-5 py-1 rounded-full bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-black dark:text-primary font-bold filled" style="font-variation-settings: 'FILL' 1, 'wght' 600;">location_on</span>
+</div>
+<span class="text-[11px] font-bold text-black dark:text-primary whitespace-nowrap">Điểm thu gom</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group text-text-secondary dark:text-gray-500 hover:text-primary-dark dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:-translate-y-0.5 transition-transform duration-200">person</span>
+<span class="text-[11px] font-medium">Hồ sơ</span>
+</a>
+</div>
+</nav>
+<div class="fixed bottom-36 right-4 z-40">
+<button class="flex items-center justify-center size-12 rounded-full bg-black dark:bg-white text-white dark:text-black shadow-lg hover:scale-105 transition-transform group">
+<span class="material-symbols-outlined group-hover:rotate-90 transition-transform duration-300">admin_panel_settings</span>
+</button>
+</div>
+
+</body></html>

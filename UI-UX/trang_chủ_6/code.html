@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WasteScan - Camera Quét Rác</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#f9f506",
+              "primary-dark": "#caca04",
+              "background-light": "#f8f8f5",
+              "background-dark": "#23220f",
+              "surface-light": "#ffffff",
+              "surface-dark": "#2c2b18",
+              "text-main": "#181811",
+              "text-secondary": "#8c8b5f",
+            },
+            fontFamily: {
+              "display": ["Spline Sans", "sans-serif"],
+              "body": ["Noto Sans", "sans-serif"],
+            },
+            borderRadius: {
+              "DEFAULT": "1rem", 
+              "lg": "1.5rem", 
+              "xl": "2rem", 
+              "full": "9999px"
+            },
+            boxShadow: {
+              'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .pt-safe {
+            padding-top: env(safe-area-inset-top);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-black text-white font-display overflow-hidden h-screen w-screen relative">
+<div class="absolute inset-0 z-0 bg-gray-900">
+<div class="w-full h-full bg-cover bg-center transition-opacity duration-700" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCOnXki2Va17WcDH2Cgc2wQyFC1DQpAsh0Koh3thZoFvOVqUOitCbOT6_3JidGxSveVTwuCLshdnqVbObvXpFVlRGXEqw2zCzEJ9ZOq_OXc0BaP1kgres4bx27DnbV8OLU_upsZ5K0F0DWJsV-v58q9OthYdUvTWL_SAckQWNr2LH-Vzv2xmlSvGzqngdyNLTBoiovagvxD_f0g7-R-QRK-trVEc7cZKsyhqbF9icqyP9Yf11bPvuu04f4NnNqB94S5IVaPJy8uqQ0"); opacity: 0.8;'>
+</div>
+<div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80"></div>
+</div>
+<div class="absolute top-0 left-0 right-0 z-30 pt-safe">
+<div class="flex items-center justify-between p-4 pt-6">
+<button class="size-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+<div class="px-4 py-1.5 rounded-full bg-black/30 backdrop-blur-sm border border-white/5">
+<span class="text-sm font-semibold tracking-wide">AI Scanner</span>
+</div>
+<div class="flex gap-3">
+<button class="size-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+<span class="material-symbols-outlined text-yellow-300" style="font-variation-settings: 'FILL' 1;">flash_on</span>
+</button>
+<button class="size-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</div>
+</div>
+<div class="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none pb-24">
+<div class="relative w-72 h-72 @xl:w-96 @xl:h-96 border border-white/20 rounded-[2rem] bg-white/5 backdrop-blur-[2px] shadow-2xl overflow-hidden">
+<div class="absolute top-1/2 left-0 right-0 h-0.5 bg-primary shadow-[0_0_15px_rgba(249,245,6,0.8)] opacity-80"></div>
+<div class="absolute top-0 left-0 size-8 border-t-4 border-l-4 border-primary rounded-tl-2xl -mt-[2px] -ml-[2px]"></div>
+<div class="absolute top-0 right-0 size-8 border-t-4 border-r-4 border-primary rounded-tr-2xl -mt-[2px] -mr-[2px]"></div>
+<div class="absolute bottom-0 left-0 size-8 border-b-4 border-l-4 border-primary rounded-bl-2xl -mb-[2px] -ml-[2px]"></div>
+<div class="absolute bottom-0 right-0 size-8 border-b-4 border-r-4 border-primary rounded-br-2xl -mb-[2px] -mr-[2px]"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/90">
+<span class="material-symbols-outlined text-4xl opacity-80">crop_free</span>
+</div>
+</div>
+<div class="mt-8 flex flex-col items-center gap-2">
+<h3 class="text-white font-bold text-xl drop-shadow-md">Quét rác thải</h3>
+<p class="text-white/80 font-medium text-sm bg-black/40 px-4 py-1.5 rounded-full backdrop-blur-md border border-white/10">
+                Đặt vật vào khung để nhận diện
+            </p>
+</div>
+</div>
+<div class="absolute bottom-0 left-0 right-0 z-30 pb-safe bg-gradient-to-t from-black via-black/80 to-transparent pt-20">
+<div class="px-8 pb-8 flex items-center justify-between max-w-md mx-auto w-full">
+<button class="flex flex-col items-center gap-2 group w-16">
+<div class="size-12 rounded-full bg-surface-dark/50 backdrop-blur-md flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition-all overflow-hidden">
+<div class="w-full h-full bg-cover bg-center opacity-80 group-hover:opacity-100" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBGAOOf_nQp1jKAP1WMn8ufHqNhvsXgaNv5Aat2orLNzaZmoA8zKEzWxN1R3nB6qwSuzrXpyn5O3n5b4nZl-TWGXJDg_6NAxA7Y-VB7YVkBSuFW0ezehoMECsy-c8sGuCbMDyqkbyMl9u2GrJbA3aD1TQGytDVDuQ8nRSzhL3_9Ps5S0VageT0n20n0KfLEEZukT4c9tCsuoI-1-SyneuQ5PTPwdzf68vz2HC0clzl8vPoiVtqrm2BJCeopz7FYhz0cA8UMHn-0V8s");'></div>
+</div>
+<span class="text-[11px] font-medium text-white/90">Thư viện</span>
+</button>
+<div class="relative group cursor-pointer -mt-4">
+<div class="size-20 rounded-full border-[3px] border-white flex items-center justify-center transition-transform duration-200 group-active:scale-95 shadow-lg">
+<div class="size-[60px] rounded-full bg-primary hover:bg-primary-dark transition-colors flex items-center justify-center shadow-[0_0_20px_rgba(249,245,6,0.4)]">
+<span class="material-symbols-outlined text-black text-3xl font-bold">qr_code_scanner</span>
+</div>
+</div>
+<span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-sm font-bold text-primary tracking-wide">QUÉT</span>
+</div>
+<button class="flex flex-col items-center gap-2 group w-16">
+<div class="size-12 rounded-full bg-surface-dark/50 backdrop-blur-md flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition-all">
+<span class="material-symbols-outlined text-white text-2xl group-active:rotate-180 transition-transform duration-500">flip_camera_ios</span>
+</div>
+<span class="text-[11px] font-medium text-white/90">Đổi cam</span>
+</button>
+</div>
+</div>
+
+</body></html>

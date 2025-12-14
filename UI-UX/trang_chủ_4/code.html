@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WasteScan - Kết Quả Quét Rác</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#f9f506",
+              "primary-dark": "#caca04",
+              "background-light": "#f8f8f5",
+              "background-dark": "#23220f",
+              "surface-light": "#ffffff",
+              "surface-dark": "#2c2b18",
+              "text-main": "#181811",
+              "text-secondary": "#8c8b5f",
+              "status-recyclable": "#3b82f6",
+              "status-organic": "#22c55e",
+              "status-hazardous": "#ef4444",
+            },
+            fontFamily: {
+              "display": ["Spline Sans", "sans-serif"],
+              "body": ["Noto Sans", "sans-serif"],
+            },
+            borderRadius: {
+              "DEFAULT": "1rem", 
+              "lg": "1.5rem", 
+              "xl": "2rem", 
+              "full": "9999px"
+            },
+            boxShadow: {
+              'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+              'soft-lg': '0 10px 30px -5px rgba(0, 0, 0, 0.08)',
+            }
+          },
+        },
+      }
+    </script>
+<style>.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }.no-scrollbar {
+            -ms-overflow-style: none;scrollbar-width: none;}.pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen text-text-main dark:text-white font-display overflow-x-hidden selection:bg-primary selection:text-black pb-24">
+<header class="sticky top-0 z-30 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md transition-colors duration-300">
+<div class="flex items-center justify-between p-4 pt-6 pb-2">
+<button class="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark shadow-sm hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-text-main dark:text-white">arrow_back</span>
+</button>
+<h2 class="text-lg font-bold tracking-tight">Kết Quả Quét Rác</h2>
+<button class="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark shadow-sm hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-text-secondary dark:text-gray-400">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</header>
+<main class="flex flex-col gap-6 px-4 pt-2">
+<div class="w-full">
+<div class="relative w-full aspect-[4/5] @xl:aspect-[16/9] rounded-2xl overflow-hidden shadow-soft-lg group mb-4">
+<div class="w-full h-full bg-center bg-no-repeat bg-cover transform transition-transform duration-700 group-hover:scale-105" data-alt="Preview of scanned plastic bottle" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCOnXki2Va17WcDH2Cgc2wQyFC1DQpAsh0Koh3thZoFvOVqUOitCbOT6_3JidGxSveVTwuCLshdnqVbObvXpFVlRGXEqw2zCzEJ9ZOq_OXc0BaP1kgres4bx27DnbV8OLU_upsZ5K0F0DWJsV-v58q9OthYdUvTWL_SAckQWNr2LH-Vzv2xmlSvGzqngdyNLTBoiovagvxD_f0g7-R-QRK-trVEc7cZKsyhqbF9icqyP9Yf11bPvuu04f4NnNqB94S5IVaPJy8uqQ0");'>
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-2">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-500 text-white shadow-sm border border-blue-400/50 backdrop-blur-md">
+<span class="material-symbols-outlined text-[16px] filled" style="font-variation-settings: 'FILL' 1;">recycling</span>
+<span class="text-xs font-bold uppercase tracking-wide">Rác tái chế</span>
+</span>
+<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-black/40 text-green-300 shadow-sm border border-white/10 backdrop-blur-md">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span class="text-xs font-bold">96% Tin cậy</span>
+</span>
+</div>
+<h1 class="text-3xl font-bold text-white mt-1">Chai nhựa PET</h1>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-sm font-medium text-gray-300">#nhựa</span>
+<span class="text-sm font-medium text-gray-300">#chai_lọ</span>
+<span class="text-sm font-medium text-gray-300">#trong_suốt</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-3 p-5 rounded-2xl bg-surface-light dark:bg-surface-dark shadow-soft border border-transparent dark:border-white/5">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-dark dark:text-primary">info</span>
+                        Cách xử lý
+                    </h3>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex gap-3 items-start">
+<div class="min-w-[24px] h-6 flex items-center justify-center rounded-full bg-gray-100 dark:bg-white/10 text-xs font-bold text-gray-500 dark:text-gray-400">1</div>
+<p class="text-sm text-text-secondary dark:text-gray-300">Đổ sạch chất lỏng còn thừa bên trong.</p>
+</div>
+<div class="flex gap-3 items-start">
+<div class="min-w-[24px] h-6 flex items-center justify-center rounded-full bg-gray-100 dark:bg-white/10 text-xs font-bold text-gray-500 dark:text-gray-400">2</div>
+<p class="text-sm text-text-secondary dark:text-gray-300">Tháo nắp và nhãn mác (nếu không phải nhựa PET).</p>
+</div>
+<div class="flex gap-3 items-start">
+<div class="min-w-[24px] h-6 flex items-center justify-center rounded-full bg-gray-100 dark:bg-white/10 text-xs font-bold text-gray-500 dark:text-gray-400">3</div>
+<p class="text-sm text-text-secondary dark:text-gray-300">Bóp dẹp chai để tiết kiệm diện tích thùng chứa.</p>
+</div>
+</div>
+<button class="mt-2 w-full flex items-center justify-center gap-2 h-11 rounded-xl bg-primary hover:bg-primary-dark transition-colors text-[#181811] text-sm font-bold shadow-md">
+                    Xem hướng dẫn chi tiết
+                </button>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<button class="flex flex-col items-center justify-center gap-2 p-4 h-28 rounded-2xl bg-surface-light dark:bg-surface-dark shadow-soft border border-transparent hover:border-primary/50 transition-all group relative overflow-hidden">
+<div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="p-2.5 rounded-full bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 mb-1 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<span class="text-sm font-bold text-center">Điểm thu gom</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-4 h-28 rounded-2xl bg-surface-light dark:bg-surface-dark shadow-soft border border-transparent hover:border-red-500/50 transition-all group relative overflow-hidden">
+<div class="absolute inset-0 bg-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="p-2.5 rounded-full bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400 mb-1 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">report_problem</span>
+</div>
+<span class="text-sm font-bold text-center text-red-600 dark:text-red-400">Báo sai</span>
+</button>
+</div>
+</div>
+<div class="mt-2 pb-6">
+<div class="flex items-center justify-between mb-3 px-1">
+<h3 class="text-sm font-bold uppercase tracking-wider text-text-secondary dark:text-gray-400">Đã quét gần đây</h3>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="w-16 h-16 shrink-0 rounded-lg bg-gray-200 dark:bg-white/10 overflow-hidden relative">
+<img class="w-full h-full object-cover opacity-70" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVE5bgXz-9jD61-Q5mZzFa7yzYvOJ_TmmWXQzqqHFFoOXiv8H9o0pDivUCguuBGGDyBifMRkwGoEocAJVl1_6OHj9dLH3AMdimNnrw7x_2fjOsnoJd08YTeBYtHGRWxg5Rkt-R-ew_jbR3x9u1xIN2YKy3zGEVa8EC-eapeD7U91y-9ICLbHXgyyzDlwPyVkSdrEqKGd7ZpR04SSESmLS4fBQD3IWsx4kIWIIQE7Rfm0LJAMwFrp4Jo9lZ74hrV-E0sbIOFQu80f4"/>
+</div>
+<div class="w-16 h-16 shrink-0 rounded-lg bg-gray-200 dark:bg-white/10 overflow-hidden relative">
+<img class="w-full h-full object-cover opacity-70" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOe2eg8VUH8JX23ilbQQ_Mj6hzKtzj2PEn2cEcgNaohYwe_PO0FycO0H0yat492ytFwe4qtDgvJslZXhz_L8G_dxgB3V0WzhHRr_HLqfQRO6Ize5WD1Dq841cUonuAChJgpKNEB6G2ngT2yYx0q6JGZ2E63pD6-WobxNy065BKyM1iD29h9BoMjx5nguTwnXFsgxtknUlI6NtixTVvaYJzDXe4542i865tRHePaWwVFAiX1yKx1NVde3VsCMweVsZlU7WheQ6jnjk"/>
+</div>
+</div>
+</div>
+</main>
+<nav class="fixed bottom-0 left-0 right-0 z-50 pb-safe bg-surface-light/80 dark:bg-surface-dark/90 backdrop-blur-lg border-t border-gray-200 dark:border-white/5">
+<div class="flex justify-around items-center h-16 px-2">
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group text-text-secondary dark:text-gray-500 hover:text-primary-dark dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:-translate-y-0.5 transition-transform duration-200">home</span>
+<span class="text-[11px] font-medium">Trang chủ</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group" href="#">
+<div class="px-5 py-1 rounded-full bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-black dark:text-primary font-bold filled" style="font-variation-settings: 'FILL' 1, 'wght' 600;">center_focus_weak</span>
+</div>
+<span class="text-[11px] font-bold text-black dark:text-primary">Quét</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group text-text-secondary dark:text-gray-500 hover:text-primary-dark dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:-translate-y-0.5 transition-transform duration-200">history</span>
+<span class="text-[11px] font-medium">Lịch sử</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group text-text-secondary dark:text-gray-500 hover:text-primary-dark dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:-translate-y-0.5 transition-transform duration-200">location_on</span>
+<span class="text-[11px] font-medium">Điểm thu gom</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group text-text-secondary dark:text-gray-500 hover:text-primary-dark dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:-translate-y-0.5 transition-transform duration-200">person</span>
+<span class="text-[11px] font-medium">Hồ sơ</span>
+</a>
+</div>
+</nav>
+
+</body></html>

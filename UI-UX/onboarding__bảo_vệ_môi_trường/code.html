@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WasteScan Onboarding</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f9f506",
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#23220f",
+                        "secondary-green": "#4a7c59", // Adding a green for the specific eco requirement
+                        "text-main": "#181811",
+                        "text-muted": "#5e5e54",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased text-text-main dark:text-white h-screen overflow-hidden flex justify-center">
+<!-- Mobile Container -->
+<div class="relative flex h-full w-full max-w-md flex-col overflow-hidden bg-background-light dark:bg-background-dark shadow-2xl sm:rounded-[2rem] sm:h-[90vh] sm:my-auto sm:border sm:border-stone-200 dark:sm:border-stone-700 transition-colors duration-300">
+<!-- Top Navigation -->
+<div class="flex items-center justify-between p-6 z-10">
+<button class="group flex h-10 w-10 items-center justify-center rounded-full bg-white/50 hover:bg-white dark:bg-black/20 dark:hover:bg-black/40 backdrop-blur-md transition-all">
+<span class="material-symbols-outlined text-text-main dark:text-white" style="font-size: 24px;">arrow_back</span>
+</button>
+<!-- Skip button usually not needed on last step, but keeping layout balanced -->
+<div class="w-10"></div>
+</div>
+<!-- Main Content Area -->
+<div class="flex flex-1 flex-col justify-between px-6 pb-8 pt-2">
+<!-- Hero Illustration -->
+<div class="relative flex w-full flex-1 flex-col items-center justify-center">
+<!-- Abstract Green Blob Background -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[80%] bg-gradient-to-tr from-secondary-green/20 to-primary/20 rounded-full blur-3xl -z-10 opacity-70"></div>
+<div class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-lg transform transition-transform duration-700 hover:scale-[1.02]">
+<div class="w-full h-full bg-center bg-cover bg-no-repeat" data-alt="Illustration of a clean green environment with recycling elements" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBPnY2H45EaJFo45JMU5jCzKblfrPcWrvv26d910lldtr8904Z9peXhO09s4tSHXmev0smOe-L5hTCiPxy_2to0S2Ypq1UnsZ3HHtHW2HIBHmkEmVAYiGKUu1xU7Pa0w5RW6_afGDHkmRM3cZWjZhtKVvs8ZhvSKrmal9gpEOXkVjc2yw5kRJEv9CxtW1a0ErLqQ4x_Z7CpoTGF6qjYvpAs6V6hJijt4pl-vzgilL2YwK_7KYo7aI7C4aqlts9zAYoWJDxQpVA-R6o");'></div>
+<!-- Overlay gradient for better text integration if needed later, kept subtle here -->
+<div class="absolute inset-0 bg-gradient-to-t from-background-light/10 to-transparent dark:from-background-dark/10"></div>
+</div>
+</div>
+<!-- Text Content Block -->
+<div class="mt-8 flex flex-col items-center text-center">
+<span class="mb-3 inline-flex items-center rounded-full bg-secondary-green/10 px-3 py-1 text-xs font-semibold text-secondary-green dark:text-green-300 border border-secondary-green/20">
+<span class="material-symbols-outlined mr-1 text-sm">eco</span>
+                    Bảo vệ môi trường
+                </span>
+<h1 class="text-3xl font-bold leading-tight tracking-tight text-text-main dark:text-white mb-4">
+                    Chung tay <br/>
+<span class="text-secondary-green dark:text-primary">Bảo vệ Môi trường</span>
+</h1>
+<p class="text-base text-text-muted dark:text-stone-300 leading-relaxed max-w-[90%]">
+                    Với mỗi loại rác được phân loại đúng, bạn đang góp phần giữ gìn màu xanh cho Trái đất. Hãy bắt đầu hành trình xanh cùng WasteScan.
+                </p>
+</div>
+<!-- Bottom Actions -->
+<div class="mt-10 flex w-full flex-col items-center gap-8">
+<!-- Page Indicators -->
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-stone-300 dark:bg-stone-700 transition-colors"></div>
+<div class="h-2 w-2 rounded-full bg-stone-300 dark:bg-stone-700 transition-colors"></div>
+<!-- Active Indicator: Elongated and Colored -->
+<div class="h-2 w-8 rounded-full bg-primary shadow-[0_0_10px_rgba(249,245,6,0.5)]"></div>
+</div>
+<!-- Primary Action Button -->
+<button class="relative w-full overflow-hidden rounded-full bg-primary py-4 text-center font-display text-lg font-bold text-[#181811] shadow-lg shadow-primary/25 transition-transform hover:scale-[1.02] active:scale-[0.98]">
+<span class="relative z-10 flex items-center justify-center gap-2">
+                        Bắt đầu ngay
+                        <span class="material-symbols-outlined text-xl">arrow_forward</span>
+</span>
+<!-- Subtle shine effect -->
+<div class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-shimmer"></div>
+</button>
+</div>
+</div>
+</div>
+</body></html>

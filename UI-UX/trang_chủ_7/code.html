@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WasteScan - Hồ sơ cá nhân</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#f9f506",
+              "primary-dark": "#caca04",
+              "background-light": "#f8f8f5",
+              "background-dark": "#23220f",
+              "surface-light": "#ffffff",
+              "surface-dark": "#2c2b18",
+              "text-main": "#181811",
+              "text-secondary": "#8c8b5f",
+              "danger": "#ef4444",
+            },
+            fontFamily: {
+              "display": ["Spline Sans", "sans-serif"],
+              "body": ["Noto Sans", "sans-serif"],
+            },
+            borderRadius: {
+              "DEFAULT": "1rem", 
+              "lg": "1.5rem", 
+              "xl": "2rem", 
+              "full": "9999px"
+            },
+            boxShadow: {
+              'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+            }
+          },
+        },
+      }
+    </script>
+<style>.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }.no-scrollbar {
+            -ms-overflow-style: none;scrollbar-width: none;}.pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+<style>
+        body {
+          min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen text-text-main dark:text-white font-display overflow-x-hidden selection:bg-primary selection:text-black pb-24">
+<header class="sticky top-0 z-30 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md transition-colors duration-300">
+<div class="flex items-center justify-between p-4 pt-6 pb-2">
+<h2 class="text-2xl font-bold tracking-tight">Hồ sơ</h2>
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-surface-light dark:hover:bg-surface-dark transition-colors text-text-secondary dark:text-gray-400">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<main class="flex flex-col gap-6 px-4 pt-2">
+<div class="flex flex-col items-center justify-center pt-2 pb-6">
+<div class="relative group cursor-pointer mb-4">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-24 ring-4 ring-surface-light dark:ring-surface-dark shadow-soft" data-alt="Portrait of user Minh smiling" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBfFTKaog5Yype352Voy17bpqCxliDyRXRFsD01mt1XpC9-qctK713jJJx3P12wZDA5Vt_PIVHTGGfLsknvEQn4B9U55hbkcfHmzfnaqUf8WMa3QMwpyr5cIUay_ILTtrK6Ske0sswAe0OrNwSASkzmrG_zBHvyd8_QaqpkhkU6tBgjX1vEWZcSW7vzWO-wl5YvSq6dzmFFKP8zvuKiol9dfkxEf6HhWHAN8jTNU_8z8DN68VgBfNwHEHeQ6oK-XsoUazJfA3nK62M");'>
+</div>
+<button class="absolute bottom-0 right-0 p-1.5 bg-primary rounded-full text-black ring-2 ring-white dark:ring-surface-dark hover:bg-primary-dark transition-colors">
+<span class="material-symbols-outlined text-[16px] font-bold">edit</span>
+</button>
+</div>
+<h3 class="text-xl font-bold text-text-main dark:text-white mb-1">Minh Nguyễn</h3>
+<p class="text-sm text-text-secondary dark:text-gray-400 mb-3">minh.nguyen@example.com</p>
+<div class="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-semibold border border-blue-200 dark:border-blue-800/50">
+<span class="material-symbols-outlined text-[16px]">verified_user</span>
+                Moderator
+            </div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-4 shadow-soft flex items-center gap-3 border border-gray-100 dark:border-white/5">
+<div class="p-2 rounded-xl bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400">
+<span class="material-symbols-outlined">eco</span>
+</div>
+<div>
+<div class="text-lg font-bold">1,250</div>
+<div class="text-xs text-text-secondary dark:text-gray-400">Điểm xanh</div>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-4 shadow-soft flex items-center gap-3 border border-gray-100 dark:border-white/5">
+<div class="p-2 rounded-xl bg-primary/20 text-yellow-700 dark:text-yellow-300">
+<span class="material-symbols-outlined">emoji_events</span>
+</div>
+<div>
+<div class="text-lg font-bold">Hạng Bạc</div>
+<div class="text-xs text-text-secondary dark:text-gray-400">Thành viên</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<h4 class="text-sm font-bold text-text-secondary dark:text-gray-500 uppercase tracking-wider px-2">Quản trị</h4>
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl overflow-hidden shadow-soft border border-gray-100 dark:border-white/5">
+<a class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group" href="#">
+<div class="flex items-center gap-4">
+<div class="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400">
+<span class="material-symbols-outlined">flag</span>
+</div>
+<div class="flex flex-col">
+<span class="text-base font-semibold text-text-main dark:text-white">Duyệt báo cáo</span>
+<span class="text-xs text-text-secondary dark:text-gray-400">Xử lý vi phạm cộng đồng</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold shadow-sm">5</span>
+<span class="material-symbols-outlined text-gray-400 group-hover:text-text-main transition-colors">chevron_right</span>
+</div>
+</a>
+<div class="h-px bg-gray-100 dark:bg-white/5 mx-4"></div>
+<a class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group" href="#">
+<div class="flex items-center gap-4">
+<div class="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400">
+<span class="material-symbols-outlined">manage_accounts</span>
+</div>
+<div class="flex flex-col">
+<span class="text-base font-semibold text-text-main dark:text-white">Quản lý người dùng</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-gray-400 group-hover:text-text-main transition-colors">chevron_right</span>
+</a>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<h4 class="text-sm font-bold text-text-secondary dark:text-gray-500 uppercase tracking-wider px-2">Cài đặt ứng dụng</h4>
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl overflow-hidden shadow-soft border border-gray-100 dark:border-white/5">
+<a class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group" href="#">
+<div class="flex items-center gap-4">
+<div class="text-text-secondary dark:text-gray-400">
+<span class="material-symbols-outlined">person</span>
+</div>
+<span class="text-base font-medium text-text-main dark:text-white">Thông tin cá nhân</span>
+</div>
+<span class="material-symbols-outlined text-gray-400 group-hover:text-text-main transition-colors">chevron_right</span>
+</a>
+<div class="h-px bg-gray-100 dark:bg-white/5 mx-4"></div>
+<a class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group" href="#">
+<div class="flex items-center gap-4">
+<div class="text-text-secondary dark:text-gray-400">
+<span class="material-symbols-outlined">notifications</span>
+</div>
+<span class="text-base font-medium text-text-main dark:text-white">Thông báo</span>
+</div>
+<span class="material-symbols-outlined text-gray-400 group-hover:text-text-main transition-colors">chevron_right</span>
+</a>
+<div class="h-px bg-gray-100 dark:bg-white/5 mx-4"></div>
+<a class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group" href="#">
+<div class="flex items-center gap-4">
+<div class="text-text-secondary dark:text-gray-400">
+<span class="material-symbols-outlined">language</span>
+</div>
+<span class="text-base font-medium text-text-main dark:text-white">Ngôn ngữ</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary dark:text-gray-400">
+<span class="text-sm">Tiếng Việt</span>
+<span class="material-symbols-outlined group-hover:text-text-main transition-colors">chevron_right</span>
+</div>
+</a>
+<div class="h-px bg-gray-100 dark:bg-white/5 mx-4"></div>
+<div class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-4">
+<div class="text-text-secondary dark:text-gray-400">
+<span class="material-symbols-outlined">dark_mode</span>
+</div>
+<span class="text-base font-medium text-text-main dark:text-white">Giao diện tối</span>
+</div>
+<button class="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 dark:bg-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+<span class="sr-only">Enable dark mode</span>
+<span class="translate-x-1 dark:translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition-transform"></span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2 pb-6">
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl overflow-hidden shadow-soft border border-gray-100 dark:border-white/5">
+<a class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group" href="#">
+<div class="flex items-center gap-4">
+<div class="text-text-secondary dark:text-gray-400">
+<span class="material-symbols-outlined">help</span>
+</div>
+<span class="text-base font-medium text-text-main dark:text-white">Trợ giúp &amp; Hỗ trợ</span>
+</div>
+</a>
+</div>
+<button class="mt-4 w-full flex items-center justify-center gap-2 p-4 rounded-2xl text-danger hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors font-semibold">
+<span class="material-symbols-outlined">logout</span>
+                Đăng xuất
+            </button>
+<p class="text-center text-xs text-text-secondary/50 dark:text-gray-600 mt-2">
+                Phiên bản 1.0.2 (Build 2023)
+            </p>
+</div>
+</main>
+<nav class="fixed bottom-0 left-0 right-0 z-50 pb-safe bg-surface-light/80 dark:bg-surface-dark/90 backdrop-blur-lg border-t border-gray-200 dark:border-white/5">
+<div class="flex justify-around items-center h-16 px-2">
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group text-text-secondary dark:text-gray-500 hover:text-primary-dark dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:-translate-y-0.5 transition-transform duration-200">home</span>
+<span class="text-[11px] font-medium">Trang chủ</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group text-text-secondary dark:text-gray-500 hover:text-primary-dark dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:-translate-y-0.5 transition-transform duration-200">center_focus_weak</span>
+<span class="text-[11px] font-medium">Quét</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group text-text-secondary dark:text-gray-500 hover:text-primary-dark dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:-translate-y-0.5 transition-transform duration-200">history</span>
+<span class="text-[11px] font-medium">Lịch sử</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group text-text-secondary dark:text-gray-500 hover:text-primary-dark dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:-translate-y-0.5 transition-transform duration-200">location_on</span>
+<span class="text-[11px] font-medium">Điểm thu gom</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 group" href="#">
+<div class="px-5 py-1 rounded-full bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-black dark:text-primary font-bold filled" style="font-variation-settings: 'FILL' 1, 'wght' 600;">person</span>
+</div>
+<span class="text-[11px] font-bold text-black dark:text-primary">Hồ sơ</span>
+</a>
+</div>
+</nav>
+
+</body></html>
