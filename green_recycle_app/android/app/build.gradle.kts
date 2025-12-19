@@ -38,6 +38,12 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+    
+    // Required for TFLite models
+    aaptOptions {
+        noCompress += "tflite"
+        noCompress += "lite"
+    }
 }
 
 flutter {

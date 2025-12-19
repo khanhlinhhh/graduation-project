@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../app_theme.dart';
@@ -261,12 +263,43 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       final XFile? pickedFile = await _imagePicker.pickImage(
         source: source,
-        maxWidth: 512,
-        maxHeight: 512,
-        imageQuality: 80,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 90,
       );
 
       if (pickedFile == null) return;
+
+      // Crop the image with circular frame
+      final CroppedFile? croppedFile = await ImageCropper().cropImage(
+        sourcePath: pickedFile.path,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        compressQuality: 80,
+        maxWidth: 512,
+        maxHeight: 512,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Cắt ảnh đại diện',
+            toolbarColor: AppTheme.primaryColor,
+            toolbarWidgetColor: Colors.white,
+            activeControlsWidgetColor: AppTheme.primaryColor,
+            initAspectRatio: CropAspectRatioPreset.square,
+            lockAspectRatio: true,
+            hideBottomControls: false,
+            cropStyle: CropStyle.circle,
+          ),
+          IOSUiSettings(
+            title: 'Cắt ảnh đại diện',
+            doneButtonTitle: 'Xong',
+            cancelButtonTitle: 'Hủy',
+            aspectRatioLockEnabled: true,
+            resetAspectRatioEnabled: false,
+            cropStyle: CropStyle.circle,
+          ),
+        ],
+      );
+
+      if (croppedFile == null) return;
 
       setState(() => _isUploadingAvatar = true);
 
@@ -281,8 +314,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       // Upload to Cloudinary using unsigned upload
       final uri = Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/image/upload');
       
-      final bytes = await pickedFile.readAsBytes();
+      // Use cropped file
+      final bytes = await File(croppedFile.path).readAsBytes();
       final base64Image = base64Encode(bytes);
+      
+      // Use unique public_id with timestamp to avoid caching issues
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final publicId = '${_user!.uid}_$timestamp';
       
       final response = await http.post(
         uri,
@@ -290,7 +328,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           'file': 'data:image/jpeg;base64,$base64Image',
           'upload_preset': uploadPreset,
           'folder': 'avatars',
-          'public_id': _user!.uid,
+          'public_id': publicId,
         },
       );
 
@@ -303,6 +341,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           uid: _user!.uid,
           avatarUrl: downloadUrl,
         );
+        
+        // Clear image cache for old URL
+        if (_avatarUrlController.text.isNotEmpty) {
+          try {
+            await NetworkImage(_avatarUrlController.text).evict();
+          } catch (_) {}
+        }
 
         setState(() {
           _avatarUrlController.text = downloadUrl;

@@ -185,10 +185,11 @@ class RewardsService {
     // Use transaction to ensure atomicity
     try {
       await _firestore.runTransaction((transaction) async {
-        // Deduct points from user
+        // Deduct points from user and increment reward count
         final userRef = _firestore.collection('users').doc(uid);
         transaction.update(userRef, {
           'greenPoints': FieldValue.increment(-reward.points),
+          'rewardCount': FieldValue.increment(1),
         });
 
         // Add redemption record

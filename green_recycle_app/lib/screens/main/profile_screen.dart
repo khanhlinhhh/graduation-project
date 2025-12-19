@@ -43,15 +43,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _navigateToEditProfile() async {
-    final result = await Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const EditProfileScreen()),
     );
     
-    // Refresh data if profile was updated
-    if (result == true) {
-      _loadUserData();
-    }
+    // Always refresh data when returning from edit profile
+    // (avatar might have been updated without pressing save button)
+    _loadUserData();
   }
 
   void _showLanguageDialog(BuildContext context) {

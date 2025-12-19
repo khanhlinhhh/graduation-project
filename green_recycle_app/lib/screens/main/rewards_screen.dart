@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import '../../app_theme.dart';
 import '../../services/rewards_service.dart';
 
@@ -10,38 +9,30 @@ class RewardsScreen extends StatefulWidget {
   State<RewardsScreen> createState() => _RewardsScreenState();
 }
 
-class _RewardsScreenState extends State<RewardsScreen> with TickerProviderStateMixin {
+class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProviderStateMixin {
   final RewardsService _rewardsService = RewardsService();
-  late AnimationController _floatController;
-  late Animation<double> _floatAnimation;
+  late AnimationController _animController;
   bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _floatController = AnimationController(
+    _animController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat(reverse: true);
-    _floatAnimation = Tween<double>(begin: -5, end: 5).animate(
-      CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
-    );
-    
     _initializeData();
   }
 
   Future<void> _initializeData() async {
-    // Ensure user has points and rewards exist
     await _rewardsService.ensureUserHasPoints();
     await _rewardsService.initializeDefaultRewards();
-    setState(() {
-      _isInitialized = true;
-    });
+    if (mounted) setState(() => _isInitialized = true);
   }
 
   @override
   void dispose() {
-    _floatController.dispose();
+    _animController.dispose();
     super.dispose();
   }
 
@@ -53,9 +44,452 @@ class _RewardsScreenState extends State<RewardsScreen> with TickerProviderStateM
     }
   }
 
-  void _showRedeemDialog(RewardModel reward, int currentPoints) {
+  @override
+  Widget build(BuildContext context) {
+    if (!_isInitialized) {
+      return Scaffold(
+        body: Container(
+          decoration: _buildGradientDecoration(),
+          child: const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(
+      body: StreamBuilder<int>(
+        stream: _rewardsService.getUserPointsStream(),
+        builder: (context, pointsSnapshot) {
+          final currentPoints = pointsSnapshot.data ?? 0;
+          
+          return StreamBuilder<List<RewardModel>>(
+            stream: _rewardsService.getRewardsStream(),
+            builder: (context, rewardsSnapshot) {
+              final rewards = rewardsSnapshot.data ?? [];
+              
+              return Container(
+                decoration: _buildGradientDecoration(),
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      // App Bar
+                      _buildAppBar(),
+                      
+                      // Points Card
+                      _buildPointsCard(currentPoints),
+                      
+                      // Rewards Section
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 20),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                          ),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 16),
+                              _buildDragHandle(),
+                              const SizedBox(height: 16),
+                              _buildSectionHeader(rewards.length),
+                              const SizedBox(height: 16),
+                              Expanded(
+                                child: _buildRewardsGrid(rewards, currentPoints),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  BoxDecoration _buildGradientDecoration() {
+    return const BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Color(0xFF4CAF50),
+          Color(0xFF2E7D32),
+          Color(0xFF1B5E20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          ),
+          const Expanded(
+            child: Text(
+              'Đổi thưởng',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, '/history'),
+            icon: const Icon(Icons.history, color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPointsCard(int points) {
+    return AnimatedBuilder(
+      animation: _animController,
+      builder: (context, child) {
+        final scale = 1.0 + (_animController.value * 0.03);
+        return Transform.scale(
+          scale: scale,
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  spreadRadius: 5,
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.eco, color: Colors.white, size: 32),
+                    ),
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Điểm xanh',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
+                          '$points',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 42,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.qr_code_scanner, color: Colors.white, size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Quét rác để kiếm thêm điểm!',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.95),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDragHandle() {
+    return Container(
+      width: 40,
+      height: 4,
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(2),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(int count) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Phần thưởng xanh',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1B5E20),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Đổi điểm lấy quà thân thiện môi trường',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.card_giftcard, size: 16, color: Colors.white),
+                const SizedBox(width: 6),
+                Text(
+                  '$count món',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRewardsGrid(List<RewardModel> rewards, int currentPoints) {
+    if (rewards.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.card_giftcard, size: 64, color: Colors.grey[300]),
+            const SizedBox(height: 16),
+            Text(
+              'Chưa có phần thưởng',
+              style: TextStyle(color: Colors.grey[500], fontSize: 16),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GridView.builder(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        childAspectRatio: 0.85,
+      ),
+      itemCount: rewards.length,
+      itemBuilder: (context, index) {
+        final reward = rewards[index];
+        final canRedeem = currentPoints >= reward.points;
+        final color = _parseColor(reward.colorHex);
+        
+        return _buildRewardCard(reward, canRedeem, color, currentPoints);
+      },
+    );
+  }
+
+  Widget _buildRewardCard(RewardModel reward, bool canRedeem, Color color, int currentPoints) {
+    return GestureDetector(
+      onTap: () => _showRedeemDialog(reward, currentPoints, color),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(canRedeem ? 0.25 : 0.1),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+          ],
+          border: Border.all(
+            color: canRedeem ? color.withOpacity(0.5) : Colors.grey.withOpacity(0.2),
+            width: canRedeem ? 2 : 1,
+          ),
+        ),
+        child: Stack(
+          children: [
+            // Glow effect for redeemable
+            if (canRedeem)
+              Positioned(
+                top: -20,
+                right: -20,
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        color.withOpacity(0.3),
+                        color.withOpacity(0),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Emoji icon with gradient background
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          color.withOpacity(0.2),
+                          color.withOpacity(0.1),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: canRedeem ? [
+                        BoxShadow(
+                          color: color.withOpacity(0.3),
+                          blurRadius: 12,
+                          spreadRadius: 2,
+                        ),
+                      ] : null,
+                    ),
+                    child: Center(
+                      child: Text(
+                        reward.emoji,
+                        style: const TextStyle(fontSize: 28),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  // Name
+                  Text(
+                    reward.name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: canRedeem ? Colors.black87 : Colors.grey[500],
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  // Points badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      gradient: canRedeem
+                          ? LinearGradient(colors: [color, color.withOpacity(0.8)])
+                          : null,
+                      color: canRedeem ? null : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Text(
+                      '${reward.points} điểm',
+                      style: TextStyle(
+                        color: canRedeem ? Colors.white : Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  
+                  // Status
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        canRedeem ? Icons.check_circle : Icons.lock_outline,
+                        size: 14,
+                        color: canRedeem ? AppTheme.primaryColor : Colors.grey[400],
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        canRedeem ? 'Có thể đổi' : 'Thiếu ${reward.points - currentPoints}đ',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: canRedeem ? AppTheme.primaryColor : Colors.grey[500],
+                          fontWeight: canRedeem ? FontWeight.w600 : FontWeight.normal,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRedeemDialog(RewardModel reward, int currentPoints, Color color) {
     final bool canRedeem = currentPoints >= reward.points;
-    final color = _parseColor(reward.colorHex);
     
     showModalBottomSheet(
       context: context,
@@ -63,16 +497,9 @@ class _RewardsScreenState extends State<RewardsScreen> with TickerProviderStateM
       isScrollControlled: true,
       builder: (context) => Container(
         padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.3),
-              blurRadius: 30,
-              offset: const Offset(0, -10),
-            ),
-          ],
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -87,33 +514,26 @@ class _RewardsScreenState extends State<RewardsScreen> with TickerProviderStateM
             ),
             const SizedBox(height: 24),
             
+            // Icon với glow
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                gradient: RadialGradient(
                   colors: [
                     color.withOpacity(0.2),
-                    color.withOpacity(0.1),
+                    color.withOpacity(0.05),
                   ],
                 ),
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withOpacity(0.3),
-                    blurRadius: 20,
-                    spreadRadius: 5,
-                  ),
-                ],
               ),
-              child: Text(reward.emoji, style: const TextStyle(fontSize: 48)),
+              child: Text(reward.emoji, style: const TextStyle(fontSize: 56)),
             ),
             const SizedBox(height: 20),
             
             Text(
               reward.name,
-              style: AppTheme.headingMedium.copyWith(
+              style: const TextStyle(
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -123,41 +543,42 @@ class _RewardsScreenState extends State<RewardsScreen> with TickerProviderStateM
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 reward.description,
-                style: AppTheme.bodyMedium.copyWith(
-                  color: AppTheme.textSecondary,
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14,
                 ),
                 textAlign: TextAlign.center,
               ),
             ),
             const SizedBox(height: 24),
             
+            // Points display
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    color.withOpacity(0.1),
-                    color.withOpacity(0.05),
-                  ],
+                  colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
                 ),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: color.withOpacity(0.3)),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.eco, color: color, size: 28),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   Text(
                     '${reward.points}',
-                    style: AppTheme.headingMedium.copyWith(
-                      color: color,
+                    style: TextStyle(
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
+                      color: color,
                     ),
                   ),
                   Text(
                     ' điểm',
-                    style: AppTheme.bodyLarge.copyWith(
+                    style: TextStyle(
+                      fontSize: 16,
                       color: color,
                     ),
                   ),
@@ -180,9 +601,10 @@ class _RewardsScreenState extends State<RewardsScreen> with TickerProviderStateM
                     const SizedBox(width: 8),
                     Text(
                       'Cần thêm ${reward.points - currentPoints} điểm nữa',
-                      style: AppTheme.bodySmall.copyWith(
+                      style: TextStyle(
                         color: Colors.red[700],
                         fontWeight: FontWeight.w500,
+                        fontSize: 13,
                       ),
                     ),
                   ],
@@ -192,13 +614,14 @@ class _RewardsScreenState extends State<RewardsScreen> with TickerProviderStateM
             
             const SizedBox(height: 24),
             
+            // Redeem button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: canRedeem
                     ? () {
                         Navigator.pop(context);
-                        _redeemReward(reward);
+                        _redeemReward(reward, color);
                       }
                     : null,
                 style: ElevatedButton.styleFrom(
@@ -208,14 +631,14 @@ class _RewardsScreenState extends State<RewardsScreen> with TickerProviderStateM
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  elevation: canRedeem ? 8 : 0,
+                  elevation: canRedeem ? 6 : 0,
                   shadowColor: color.withOpacity(0.5),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(canRedeem ? Icons.card_giftcard : Icons.lock_outline),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     Text(
                       canRedeem ? 'Đổi ngay' : 'Chưa đủ điểm',
                       style: const TextStyle(
@@ -234,62 +657,90 @@ class _RewardsScreenState extends State<RewardsScreen> with TickerProviderStateM
     );
   }
 
-  Future<void> _redeemReward(RewardModel reward) async {
-    final color = _parseColor(reward.colorHex);
-    
-    // Show loading indicator
+  Future<void> _redeemReward(RewardModel reward, Color color) async {
+    // Show loading
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
+      builder: (context) => Center(
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const CircularProgressIndicator(),
+        ),
       ),
     );
 
     final success = await _rewardsService.redeemReward(reward);
-    
-    // Hide loading indicator
     Navigator.pop(context);
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
+      // Show success dialog
+      showDialog(
+        context: context,
+        builder: (context) => Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: AppTheme.primaryColor,
+                    size: 56,
+                  ),
                 ),
-                child: Text(reward.emoji, style: const TextStyle(fontSize: 20)),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Đổi thưởng thành công! 🎉',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      reward.name,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ],
+                const SizedBox(height: 20),
+                const Text(
+                  'Đổi thưởng thành công! 🎉',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                Text(
+                  'Bạn đã đổi ${reward.name}',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Tuyệt vời!',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          backgroundColor: color,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 3),
         ),
       );
     } else {
@@ -298,356 +749,10 @@ class _RewardsScreenState extends State<RewardsScreen> with TickerProviderStateM
           content: const Text('Đổi thưởng thất bại. Vui lòng thử lại!'),
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           margin: const EdgeInsets.all(16),
         ),
       );
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_isInitialized) {
-      return Scaffold(
-        backgroundColor: const Color(0xFFF8F9FA),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(color: Color(0xFFFF9800)),
-              const SizedBox(height: 16),
-              Text(
-                'Đang tải...',
-                style: AppTheme.bodyMedium,
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
-      body: StreamBuilder<int>(
-        stream: _rewardsService.getUserPointsStream(),
-        builder: (context, pointsSnapshot) {
-          final currentPoints = pointsSnapshot.data ?? 0;
-          
-          return StreamBuilder<List<RewardModel>>(
-            stream: _rewardsService.getRewardsStream(),
-            builder: (context, rewardsSnapshot) {
-              final rewards = rewardsSnapshot.data ?? [];
-              
-              return CustomScrollView(
-                slivers: [
-                  // Custom App Bar with gradient
-                  SliverAppBar(
-                    expandedHeight: 280,
-                    pinned: true,
-                    backgroundColor: const Color(0xFFFF9800),
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xFFFF9800),
-                              Color(0xFFF57C00),
-                              Color(0xFFEF6C00),
-                            ],
-                          ),
-                        ),
-                        child: SafeArea(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const SizedBox(height: 40),
-                              AnimatedBuilder(
-                                animation: _floatAnimation,
-                                builder: (context, child) {
-                                  return Transform.translate(
-                                    offset: Offset(0, _floatAnimation.value),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(20),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.2),
-                                        shape: BoxShape.circle,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(0.1),
-                                            blurRadius: 20,
-                                            spreadRadius: 5,
-                                          ),
-                                        ],
-                                      ),
-                                      child: const Icon(
-                                        Icons.card_giftcard,
-                                        size: 40,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Điểm xanh của bạn',
-                                style: AppTheme.bodyLarge.copyWith(
-                                  color: Colors.white.withOpacity(0.9),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: const Icon(Icons.eco, color: Colors.white, size: 32),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    '$currentPoints',
-                                    style: const TextStyle(
-                                      fontSize: 48,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      letterSpacing: 2,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.qr_code_scanner, color: Colors.white, size: 16),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'Quét rác để kiếm thêm điểm!',
-                                      style: AppTheme.bodySmall.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      title: const Text(
-                        'Đổi Thưởng',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      centerTitle: true,
-                    ),
-                  ),
-
-                  // Rewards section header
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Phần thưởng xanh',
-                                style: AppTheme.headingSmall.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Đổi điểm lấy quà thân thiện môi trường',
-                                style: AppTheme.bodySmall.copyWith(
-                                  color: AppTheme.textSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryColor.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.eco, size: 16, color: AppTheme.primaryColor),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '${rewards.length} món',
-                                  style: AppTheme.bodySmall.copyWith(
-                                    color: AppTheme.primaryColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Loading or empty state
-                  if (rewards.isEmpty)
-                    SliverFillRemaining(
-                      child: Center(
-                        child: rewardsSnapshot.connectionState == ConnectionState.waiting
-                            ? const CircularProgressIndicator()
-                            : Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.card_giftcard, size: 64, color: Colors.grey),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'Chưa có phần thưởng',
-                                    style: AppTheme.bodyLarge.copyWith(color: Colors.grey),
-                                  ),
-                                ],
-                              ),
-                      ),
-                    )
-                  else
-                    // Rewards Grid
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      sliver: SliverGrid(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                          childAspectRatio: 0.78,
-                        ),
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final reward = rewards[index];
-                            final canRedeem = currentPoints >= reward.points;
-                            final color = _parseColor(reward.colorHex);
-                            
-                            return GestureDetector(
-                              onTap: () => _showRedeemDialog(reward, currentPoints),
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: color.withOpacity(0.15),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                  border: canRedeem
-                                      ? Border.all(color: color.withOpacity(0.4), width: 2)
-                                      : null,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    // Emoji icon
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: color.withOpacity(0.15),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Text(
-                                        reward.emoji,
-                                        style: const TextStyle(fontSize: 24),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    
-                                    // Name
-                                    Text(
-                                      reward.name,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13,
-                                        color: canRedeem ? Colors.black87 : Colors.grey,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 6),
-                                    
-                                    // Points badge
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: canRedeem ? color : Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        '${reward.points} điểm',
-                                        style: TextStyle(
-                                          color: canRedeem ? Colors.white : Colors.grey[600],
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    
-                                    // Status text
-                                    Text(
-                                      canRedeem ? '✓ Có thể đổi' : 'Thiếu ${reward.points - currentPoints}đ',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: canRedeem ? AppTheme.primaryColor : Colors.grey,
-                                        fontWeight: canRedeem ? FontWeight.w600 : FontWeight.normal,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                          childCount: rewards.length,
-                        ),
-                      ),
-                    ),
-                  
-                  const SliverToBoxAdapter(
-                    child: SizedBox(height: 32),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      ),
-    );
   }
 }

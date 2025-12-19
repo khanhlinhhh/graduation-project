@@ -37,6 +37,15 @@ dependencies:
   
   # Environment variables
   flutter_dotenv: ^5.1.0
+  
+  # Camera for live preview
+  camera: ^0.11.0+2
+  
+  # YOLOv11 TFLite integration
+  flutter_vision: ^2.0.0
+  
+  # Image Cropper for avatar
+  image_cropper: ^8.0.2
 
 dev_dependencies:
   flutter_test:
