@@ -29,32 +29,74 @@
 
 ```
 graduation-project/
-├── 📁 UI-UX/                    # Thiết kế giao diện UI/UX
-│   ├── onboarding_*/            # Màn hình giới thiệu
-│   ├── trang_chủ_*/             # Thiết kế trang chủ
-│   └── đăng_ký, đăng_nhập/      # Màn hình xác thực
+├── 📁 UI-UX/                        # Thiết kế giao diện UI/UX
+│   ├── onboarding__*/               # Màn hình giới thiệu (3 screens)
+│   ├── trang_chủ_*/                 # Thiết kế trang chủ (7 versions)
+│   ├── đăng_ký/                     # Màn hình đăng ký
+│   └── đăng_nhập/                   # Màn hình đăng nhập
 │
-└── 📁 green_recycle_app/        # Ứng dụng Flutter chính
+├── 📁 examples/                     # Ví dụ và tutorials
+│   └── tutorial.ipynb               # Jupyter notebook hướng dẫn
+│
+└── 📁 green_recycle_app/            # Ứng dụng Flutter chính
     ├── lib/
-    │   ├── main.dart            # Entry point
-    │   ├── app_theme.dart       # Cấu hình theme (Light/Dark)
-    │   ├── routes.dart          # Định tuyến ứng dụng
-    │   ├── 📁 models/           # Data models
-    │   │   └── user_model.dart
-    │   ├── 📁 services/         # Business logic services
-    │   │   ├── auth_service.dart
-    │   │   ├── chatbot_service.dart
-    │   │   ├── user_service.dart
-    │   │   └── rewards_service.dart
-    │   ├── 📁 screens/          # UI Screens
-    │   │   ├── auth/            # Đăng nhập, Đăng ký
-    │   │   ├── main/            # Các màn hình chính
-    │   │   └── onboarding/      # Màn hình giới thiệu
-    │   ├── 📁 widgets/          # Reusable widgets
-    │   └── 📁 providers/        # State management
-    ├── assets/images/           # Hình ảnh tài nguyên
-    ├── functions/               # Firebase Cloud Functions
-    └── pubspec.yaml             # Dependencies
+    │   ├── main.dart                # Entry point
+    │   ├── app_theme.dart           # Cấu hình theme (Light/Dark)
+    │   ├── routes.dart              # Định tuyến ứng dụng
+    │   ├── firebase_options.dart    # Cấu hình Firebase
+    │   │
+    │   ├── 📁 models/               # Data models
+    │   │   ├── user_model.dart      # Model người dùng
+    │   │   ├── tip_model.dart       # Model mẹo tái chế
+    │   │   └── classification_history.dart  # Lịch sử phân loại
+    │   │
+    │   ├── 📁 services/             # Business logic services
+    │   │   ├── auth_service.dart    # Xác thực người dùng
+    │   │   ├── chatbot_service.dart # AI chatbot (Groq)
+    │   │   ├── user_service.dart    # Quản lý user
+    │   │   ├── rewards_service.dart # Hệ thống điểm thưởng
+    │   │   ├── history_service.dart # Lịch sử phân loại
+    │   │   └── classifier_service.dart  # TFLite phân loại rác
+    │   │
+    │   ├── 📁 screens/              # UI Screens
+    │   │   ├── auth/                # Đăng nhập, Đăng ký
+    │   │   │   ├── login_screen.dart
+    │   │   │   └── register_screen.dart
+    │   │   ├── main/                # Các màn hình chính
+    │   │   │   ├── main_screen.dart
+    │   │   │   ├── home_screen.dart
+    │   │   │   ├── camera_screen.dart
+    │   │   │   ├── result_screen.dart
+    │   │   │   ├── chatbot_screen.dart
+    │   │   │   ├── collection_points_screen.dart
+    │   │   │   ├── history_screen.dart
+    │   │   │   ├── stats_screen.dart
+    │   │   │   ├── rewards_screen.dart
+    │   │   │   ├── profile_screen.dart
+    │   │   │   └── edit_profile_screen.dart
+    │   │   ├── onboarding/          # Màn hình giới thiệu
+    │   │   │   └── onboarding_screen.dart
+    │   │   └── tips/                # Màn hình mẹo
+    │   │       └── tips_screen.dart
+    │   │
+    │   ├── 📁 widgets/              # Reusable widgets
+    │   │   ├── auth_wrapper.dart    # Wrapper xác thực
+    │   │   ├── custom_button.dart   # Button tùy chỉnh
+    │   │   └── custom_text_field.dart  # TextField tùy chỉnh
+    │   │
+    │   └── 📁 providers/            # State management
+    │       └── settings_provider.dart  # Quản lý cài đặt
+    │
+    ├── assets/images/               # Hình ảnh và AI models
+    │   ├── best_float32.tflite      # TFLite model phân loại rác
+    │   ├── label.txt                # Nhãn phân loại
+    │   └── onboarding_*.png         # Ảnh onboarding
+    │
+    ├── functions/                   # Firebase Cloud Functions
+    ├── android/                     # Cấu hình Android
+    ├── ios/                         # Cấu hình iOS
+    ├── web/                         # Cấu hình Web
+    └── pubspec.yaml                 # Dependencies
 ```
 
 ---
@@ -74,7 +116,9 @@ graduation-project/
 - **Cloud Functions** - Serverless functions
 
 ### AI & Tools
+- **TensorFlow Lite** - AI model nhận diện và phân loại rác thải
 - **Groq API** - Sử dụng model **Llama 3.1 8B** cho chatbot thông minh (miễn phí, tốc độ cao)
+- **Camera** - Quét và nhận diện rác real-time
 - **Image Picker** - Chọn/chụp ảnh từ thiết bị
 - **URL Launcher** - Mở bản đồ và liên kết ngoài
 
@@ -129,6 +173,7 @@ graduation-project/
 | Onboarding | `onboarding_screen.dart` | Giới thiệu ứng dụng cho người dùng mới |
 | Đăng nhập | `login_screen.dart` | Đăng nhập bằng Email hoặc Google |
 | Đăng ký | `register_screen.dart` | Tạo tài khoản mới |
+| Main | `main_screen.dart` | Điều hướng chính với bottom navigation |
 | Trang chủ | `home_screen.dart` | Dashboard chính của ứng dụng |
 | Camera | `camera_screen.dart` | Quét và phân loại rác |
 | Kết quả | `result_screen.dart` | Hiển thị kết quả phân loại |
@@ -139,6 +184,7 @@ graduation-project/
 | Phần thưởng | `rewards_screen.dart` | Đổi điểm lấy phần thưởng |
 | Hồ sơ | `profile_screen.dart` | Thông tin cá nhân |
 | Chỉnh sửa hồ sơ | `edit_profile_screen.dart` | Cập nhật thông tin |
+| Mẹo tái chế | `tips_screen.dart` | Xem chi tiết các mẹo tái chế |
 
 ---
 
