@@ -160,10 +160,6 @@ Dự án này được phát triển cho mục đích tốt nghiệp.
 
 ## 👥 Tác giả
 
-- **Sinh viên thực hiện**: [Nguyễn Khánh Linh]
-- **Giảng viên hướng dẫn**: [Thái Văn Hòa]
-- **Trường**: [ĐỜI]
-
 ---
 
 <div align="center">
