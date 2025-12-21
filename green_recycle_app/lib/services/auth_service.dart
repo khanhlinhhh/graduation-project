@@ -114,7 +114,7 @@ class AuthService {
       'email': email,
       'displayName': displayName,
       'avatarUrl': null,
-      'greenPoints': 1000, // Initial green points for new users
+      'greenPoints': 0, // Initial green points for new users
       'scanCount': 0,
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),

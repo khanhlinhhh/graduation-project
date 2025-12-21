@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import '../../app_theme.dart';
 import '../../models/tip_model.dart';
 import '../../models/user_model.dart';
+import '../../models/classification_history.dart';
 import '../../services/user_service.dart';
+import '../../services/tips_service.dart';
+import '../../services/history_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,6 +17,39 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final UserService _userService = UserService();
+  final TipsService _tipsService = TipsService();
+  final HistoryService _historyService = HistoryService();
+  StreamSubscription? _tipsSubscription;
+  List<TipModel> _featuredTips = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _subscribeToTips();
+  }
+
+  @override
+  void dispose() {
+    _tipsSubscription?.cancel();
+    super.dispose();
+  }
+
+  void _subscribeToTips() {
+    _tipsSubscription = _tipsService.getTipsStream().listen(
+      (tips) {
+        if (tips.isEmpty) {
+          setState(() => _featuredTips = TipsData.featuredTips);
+        } else {
+          // Lấy tối đa 5 tips đầu tiên cho home screen
+          setState(() => _featuredTips = tips.take(5).toList());
+        }
+      },
+      onError: (error) {
+        print('Error in tips stream: $error');
+        setState(() => _featuredTips = TipsData.featuredTips);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -247,14 +284,20 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 12),
               SizedBox(
                 height: 220,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: TipsData.featuredTips.length,
-                  itemBuilder: (context, index) {
-                    final tip = TipsData.featuredTips[index];
-                    return _buildTipCard(tip);
-                  },
-                ),
+                child: _featuredTips.isEmpty
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          color: AppTheme.primaryColor,
+                        ),
+                      )
+                    : ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _featuredTips.length,
+                        itemBuilder: (context, index) {
+                          final tip = _featuredTips[index];
+                          return _buildTipCard(tip);
+                        },
+                      ),
               ),
               const SizedBox(height: 24),
 
@@ -267,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: AppTheme.headingSmall,
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () => Navigator.pushNamed(context, '/history'),
                     child: Text(
                       'Xem tất cả',
                       style: AppTheme.bodyMedium.copyWith(
@@ -278,28 +321,46 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               const SizedBox(height: 8),
-              _buildActivityItem(
-                'Chai nhựa',
-                'Tái chế',
-                '2 phút trước',
-                Icons.recycling,
-                const Color(0xFF4CAF50),
-              ),
-              const SizedBox(height: 8),
-              _buildActivityItem(
-                'Vỏ chuối',
-                'Hữu cơ',
-                '1 giờ trước',
-                Icons.compost,
-                const Color(0xFF8BC34A),
-              ),
-              const SizedBox(height: 8),
-              _buildActivityItem(
-                'Pin cũ',
-                'Nguy hại',
-                'Hôm qua',
-                Icons.warning_amber,
-                const Color(0xFFF44336),
+              // StreamBuilder cho Recent Activities
+              StreamBuilder<List<ClassificationHistory>>(
+                stream: _historyService.getUserHistoryStream(limit: 5),
+                builder: (context, historySnapshot) {
+                  final recentActivities = historySnapshot.data ?? [];
+                  
+                  if (recentActivities.isEmpty) {
+                    return Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(Icons.history, size: 48, color: Colors.grey[400]),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Chưa có hoạt động nào',
+                            style: AppTheme.bodyMedium.copyWith(color: Colors.grey[600]),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Hãy scan rác để bắt đầu!',
+                            style: AppTheme.bodySmall.copyWith(color: Colors.grey[400]),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  
+                  return Column(
+                    children: recentActivities.take(3).map((activity) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: _buildActivityItemFromHistory(activity),
+                      );
+                    }).toList(),
+                  );
+                },
               ),
               const SizedBox(height: 80),
                 ],
@@ -315,6 +376,145 @@ class _HomeScreenState extends State<HomeScreen> {
     return number.toString().replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]},',
+    );
+  }
+
+  String _formatTimeAgo(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+    
+    if (difference.inMinutes < 1) {
+      return 'Vừa xong';
+    } else if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} phút trước';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours} giờ trước';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} ngày trước';
+    } else {
+      return '${timestamp.day}/${timestamp.month}/${timestamp.year}';
+    }
+  }
+
+  IconData _getLabelIcon(String label) {
+    switch (label.toLowerCase()) {
+      case 'hữu cơ':
+        return Icons.compost;
+      case 'tái chế':
+        return Icons.recycling;
+      case 'nguy hại':
+        return Icons.warning_amber;
+      case 'điện tử':
+        return Icons.devices;
+      case 'giấy':
+        return Icons.newspaper;
+      default:
+        return Icons.delete_outline;
+    }
+  }
+
+  Color _getLabelColor(String label) {
+    switch (label.toLowerCase()) {
+      case 'hữu cơ':
+        return const Color(0xFF8BC34A);
+      case 'tái chế':
+        return const Color(0xFF4CAF50);
+      case 'nguy hại':
+        return const Color(0xFFF44336);
+      case 'điện tử':
+        return const Color(0xFF9C27B0);
+      case 'giấy':
+        return const Color(0xFF2196F3);
+      default:
+        return const Color(0xFF607D8B);
+    }
+  }
+
+  Widget _buildActivityItemFromHistory(ClassificationHistory activity) {
+    final color = _getLabelColor(activity.label);
+    final icon = _getLabelIcon(activity.label);
+    final timeAgo = _formatTimeAgo(activity.timestamp);
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  activity.labelEn.isNotEmpty ? activity.labelEn : activity.label,
+                  style: AppTheme.bodyLarge.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        activity.label,
+                        style: AppTheme.bodySmall.copyWith(
+                          color: color,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '• $timeAgo',
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Icon xác nhận đã scan
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.check,
+              color: color,
+              size: 16,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -714,28 +914,22 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image with category badge
+            // Icon with category badge
             Stack(
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  child: Image.network(
-                    tip.imageUrl,
-                    height: 100,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 100,
-                        color: tip.categoryColor.withOpacity(0.2),
-                        child: Icon(
-                          Icons.eco,
-                          size: 40,
-                          color: tip.categoryColor,
-                        ),
-                      );
-                    },
-                  ),
+                  child: tip.imageUrl.isNotEmpty
+                      ? Image.network(
+                          tip.imageUrl,
+                          height: 100,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return _buildTipIconContainer(tip);
+                          },
+                        )
+                      : _buildTipIconContainer(tip),
                 ),
                 Positioned(
                   top: 8,
@@ -790,6 +984,40 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildTipIconContainer(TipModel tip) {
+    return Container(
+      height: 100,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: tip.categoryColor.withOpacity(0.2),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      child: Center(
+        child: Text(
+          tip.icon,
+          style: const TextStyle(fontSize: 48),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailIconHeader(TipModel tip) {
+    return Container(
+      height: 200,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: tip.categoryColor.withOpacity(0.2),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Center(
+        child: Text(
+          tip.icon,
+          style: const TextStyle(fontSize: 80),
+        ),
+      ),
+    );
+  }
+
   void _showTipDetails(TipModel tip) {
     showModalBottomSheet(
       context: context,
@@ -807,28 +1035,22 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header image
+              // Header with icon
               Stack(
                 children: [
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                    child: Image.network(
-                      tip.imageUrl,
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 200,
-                          color: tip.categoryColor.withOpacity(0.2),
-                          child: Icon(
-                            Icons.eco,
-                            size: 60,
-                            color: tip.categoryColor,
-                          ),
-                        );
-                      },
-                    ),
+                    child: tip.imageUrl.isNotEmpty
+                        ? Image.network(
+                            tip.imageUrl,
+                            height: 200,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return _buildDetailIconHeader(tip);
+                            },
+                          )
+                        : _buildDetailIconHeader(tip),
                   ),
                   // Close button
                   Positioned(

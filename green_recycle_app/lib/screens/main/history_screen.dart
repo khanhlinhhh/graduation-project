@@ -123,7 +123,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
           
           // Calculate stats
           final totalScans = allItems.length;
-          final totalPoints = allItems.fold<int>(0, (sum, item) => sum + item.pointsEarned);
           final categories = allItems.map((e) => e.label).toSet().length;
 
           return Column(
@@ -147,12 +146,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _buildSummaryItem(totalScans.toString(), 'Tổng quét'),
-                    Container(
-                      width: 1,
-                      height: 40,
-                      color: Colors.white.withOpacity(0.3),
-                    ),
-                    _buildSummaryItem(totalPoints.toString(), 'Điểm nhận'),
                     Container(
                       width: 1,
                       height: 40,
@@ -347,18 +340,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ],
             ),
           ),
+          // Icon xác nhận
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppTheme.primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
             ),
-            child: Text(
-              '+${item.pointsEarned}',
-              style: AppTheme.bodyMedium.copyWith(
-                color: AppTheme.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
+            child: Icon(
+              Icons.check,
+              color: color,
+              size: 18,
             ),
           ),
         ],

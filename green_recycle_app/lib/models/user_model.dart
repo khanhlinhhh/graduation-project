@@ -10,6 +10,10 @@ class UserModel {
   final int rewardCount;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  // Check-in fields
+  final DateTime? lastCheckInDate;
+  final int checkInStreak;
+  final int totalCheckIns;
 
   UserModel({
     required this.uid,
@@ -21,6 +25,9 @@ class UserModel {
     this.rewardCount = 0,
     this.createdAt,
     this.updatedAt,
+    this.lastCheckInDate,
+    this.checkInStreak = 0,
+    this.totalCheckIns = 0,
   });
 
   // Create from Firestore document
@@ -35,6 +42,9 @@ class UserModel {
       rewardCount: map['rewardCount'] ?? 0,
       createdAt: (map['createdAt'] as Timestamp?)?.toDate(),
       updatedAt: (map['updatedAt'] as Timestamp?)?.toDate(),
+      lastCheckInDate: (map['lastCheckInDate'] as Timestamp?)?.toDate(),
+      checkInStreak: map['checkInStreak'] ?? 0,
+      totalCheckIns: map['totalCheckIns'] ?? 0,
     );
   }
 
@@ -50,6 +60,9 @@ class UserModel {
       'rewardCount': rewardCount,
       'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
+      'lastCheckInDate': lastCheckInDate != null ? Timestamp.fromDate(lastCheckInDate!) : null,
+      'checkInStreak': checkInStreak,
+      'totalCheckIns': totalCheckIns,
     };
   }
 
@@ -69,6 +82,9 @@ class UserModel {
     int? rewardCount,
     DateTime? createdAt,
     DateTime? updatedAt,
+    DateTime? lastCheckInDate,
+    int? checkInStreak,
+    int? totalCheckIns,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -80,6 +96,9 @@ class UserModel {
       rewardCount: rewardCount ?? this.rewardCount,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      lastCheckInDate: lastCheckInDate ?? this.lastCheckInDate,
+      checkInStreak: checkInStreak ?? this.checkInStreak,
+      totalCheckIns: totalCheckIns ?? this.totalCheckIns,
     );
   }
 

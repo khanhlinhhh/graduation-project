@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../app_theme.dart';
 import '../../services/rewards_service.dart';
+import '../../services/check_in_service.dart';
 
 class RewardsScreen extends StatefulWidget {
   const RewardsScreen({super.key});
@@ -11,8 +12,10 @@ class RewardsScreen extends StatefulWidget {
 
 class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProviderStateMixin {
   final RewardsService _rewardsService = RewardsService();
+  final CheckInService _checkInService = CheckInService();
   late AnimationController _animController;
   bool _isInitialized = false;
+  bool _isCheckingIn = false;
 
   @override
   void initState() {
@@ -68,42 +71,76 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
             builder: (context, rewardsSnapshot) {
               final rewards = rewardsSnapshot.data ?? [];
               
-              return Container(
-                decoration: _buildGradientDecoration(),
-                child: SafeArea(
-                  child: Column(
-                    children: [
-                      // App Bar
-                      _buildAppBar(),
-                      
-                      // Points Card
-                      _buildPointsCard(currentPoints),
-                      
-                      // Rewards Section
-                      Expanded(
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 20),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-                          ),
+              return StreamBuilder<Map<String, dynamic>>(
+                stream: _checkInService.getCheckInInfoStream(),
+                builder: (context, checkInSnapshot) {
+                  final checkInInfo = checkInSnapshot.data ?? {
+                    'streak': 0,
+                    'canCheckIn': true,
+                    'nextPoints': 10,
+                    'totalCheckIns': 0,
+                  };
+                  
+                  return Container(
+                    decoration: _buildGradientDecoration(),
+                    child: Stack(
+                      children: [
+                        // Background content (Points + Check-in)
+                        SafeArea(
+                          bottom: false,
                           child: Column(
                             children: [
-                              const SizedBox(height: 16),
-                              _buildDragHandle(),
-                              const SizedBox(height: 16),
-                              _buildSectionHeader(rewards.length),
-                              const SizedBox(height: 16),
-                              Expanded(
-                                child: _buildRewardsGrid(rewards, currentPoints),
-                              ),
+                              // App Bar
+                              _buildAppBar(),
+                              
+                              // Points Card
+                              _buildPointsCard(currentPoints),
+                              
+                              // Check-in Section
+                              _buildCheckInSection(checkInInfo),
                             ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
+                        
+                        // Draggable Rewards Sheet
+                        DraggableScrollableSheet(
+                          initialChildSize: 0.35,
+                          minChildSize: 0.15,
+                          maxChildSize: 0.85,
+                          snap: true,
+                          snapSizes: const [0.15, 0.35, 0.85],
+                          builder: (context, scrollController) {
+                            return Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 20,
+                                    offset: Offset(0, -5),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 12),
+                                  _buildDragHandle(),
+                                  const SizedBox(height: 12),
+                                  _buildSectionHeader(rewards.length),
+                                  const SizedBox(height: 12),
+                                  Expanded(
+                                    child: _buildRewardsGridScrollable(rewards, currentPoints, scrollController),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
               );
             },
           );
@@ -224,10 +261,10 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.qr_code_scanner, color: Colors.white, size: 18),
+                      const Icon(Icons.calendar_today, color: Colors.white, size: 18),
                       const SizedBox(width: 8),
                       Text(
-                        'Quét rác để kiếm thêm điểm!',
+                        'Check-in hàng ngày để nhận điểm!',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.95),
                           fontSize: 13,
@@ -252,6 +289,271 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
       decoration: BoxDecoration(
         color: Colors.grey[300],
         borderRadius: BorderRadius.circular(2),
+      ),
+    );
+  }
+
+  Widget _buildCheckInSection(Map<String, dynamic> checkInInfo) {
+    final int streak = checkInInfo['streak'] ?? 0;
+    final bool canCheckIn = checkInInfo['canCheckIn'] ?? false;
+    final int nextPoints = checkInInfo['nextPoints'] ?? 10;
+    final int totalCheckIns = checkInInfo['totalCheckIns'] ?? 0;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+      ),
+      child: Column(
+        children: [
+          // Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.event_available, color: Colors.white, size: 20),
+                  ),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Check-in hàng ngày',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              // Streak badge
+              if (streak > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.orange.withOpacity(0.5)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('🔥', style: TextStyle(fontSize: 14)),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$streak ngày',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          
+          // Stats row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildCheckInStat('Tổng', '$totalCheckIns', Icons.check_circle_outline),
+              _buildCheckInStat('Chuỗi', '$streak', Icons.local_fire_department),
+              _buildCheckInStat('Điểm tiếp', '+$nextPoints', Icons.stars),
+            ],
+          ),
+          const SizedBox(height: 16),
+          
+          // Check-in button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: canCheckIn && !_isCheckingIn ? _performCheckIn : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: canCheckIn ? Colors.white : Colors.white.withOpacity(0.3),
+                foregroundColor: canCheckIn ? AppTheme.primaryColor : Colors.white54,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                elevation: canCheckIn ? 4 : 0,
+              ),
+              child: _isCheckingIn
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          canCheckIn ? Icons.check_circle : Icons.check_circle_outline,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          canCheckIn ? 'CHECK-IN NGAY (+$nextPoints điểm)' : 'Đã check-in hôm nay ✓',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCheckInStat(String label, String value, IconData icon) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.white.withOpacity(0.8), size: 22),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.7),
+            fontSize: 11,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _performCheckIn() async {
+    if (_isCheckingIn) return;
+    
+    setState(() => _isCheckingIn = true);
+    
+    final result = await _checkInService.performCheckIn();
+    
+    if (!mounted) return;
+    setState(() => _isCheckingIn = false);
+    
+    if (result['success'] == true) {
+      // Show success animation/dialog
+      _showCheckInSuccessDialog(
+        result['pointsEarned'] ?? 0,
+        result['newStreak'] ?? 1,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message'] ?? 'Lỗi check-in'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+    }
+  }
+
+  void _showCheckInSuccessDialog(int points, int streak) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Text('🎉', style: TextStyle(fontSize: 48)),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Check-in thành công!',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '+$points điểm',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('🔥', style: TextStyle(fontSize: 20)),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Chuỗi $streak ngày liên tiếp',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Tuyệt vời!',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -330,6 +632,48 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
 
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        childAspectRatio: 0.85,
+      ),
+      itemCount: rewards.length,
+      itemBuilder: (context, index) {
+        final reward = rewards[index];
+        final canRedeem = currentPoints >= reward.points;
+        final color = _parseColor(reward.colorHex);
+        
+        return _buildRewardCard(reward, canRedeem, color, currentPoints);
+      },
+    );
+  }
+
+  Widget _buildRewardsGridScrollable(List<RewardModel> rewards, int currentPoints, ScrollController scrollController) {
+    if (rewards.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.card_giftcard, size: 64, color: Colors.grey[300]),
+            const SizedBox(height: 16),
+            Text(
+              'Chưa có phần thưởng',
+              style: TextStyle(color: Colors.grey[500], fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Kéo lên để xem thêm',
+              style: TextStyle(color: Colors.grey[400], fontSize: 12),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GridView.builder(
+      controller: scrollController,
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 16,

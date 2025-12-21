@@ -21,8 +21,6 @@ class _ResultScreenState extends State<ResultScreen> {
   bool _saved = false;
   List<DetectionResult> _detections = [];
 
-  int get _totalPoints => _detections.fold(0, (sum, d) => sum + d.points);
-
   Future<void> _saveAllResults() async {
     if (_saved || _isSaving || _detections.isEmpty) return;
 
@@ -36,22 +34,18 @@ class _ResultScreenState extends State<ResultScreen> {
       
       debugPrint('ResultScreen: Saving ${_detections.length} detections for user $uid...');
       
-      // Save each detection to history
+      // Save each detection to history (no points)
       for (final result in _detections) {
         await _historyService.saveClassification(
           labelEn: result.labelEn,
           label: result.label,
           confidence: result.confidence,
-          pointsEarned: result.points,
+          pointsEarned: 0, // Không cộng điểm khi scan
         );
       }
       debugPrint('ResultScreen: All history saved');
 
-      // Add total green points
-      await _userService.updateGreenPoints(uid, _totalPoints);
-      debugPrint('ResultScreen: ${_totalPoints} points added');
-      
-      // Increment scan count (once per scan session, not per detection)
+      // Chỉ tăng scan count, không cộng điểm
       await _userService.incrementScanCount(uid);
       debugPrint('ResultScreen: Scan count incremented');
 
@@ -203,32 +197,31 @@ class _ResultScreenState extends State<ResultScreen> {
                         ),
                         const SizedBox(height: 8),
                         
-                        // Total points earned
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (_isSaving)
-                              const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            else if (_saved)
+                        // Saving status
+                        if (_isSaving)
+                          const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        else if (_saved)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
                               const Icon(
                                 Icons.check_circle,
                                 color: AppTheme.primaryColor,
                                 size: 20,
                               ),
-                            const SizedBox(width: 8),
-                            Text(
-                              '+$_totalPoints điểm xanh',
-                              style: AppTheme.bodyLarge.copyWith(
-                                color: AppTheme.accentColor,
-                                fontWeight: FontWeight.bold,
+                              const SizedBox(width: 8),
+                              Text(
+                                'Đã lưu vào lịch sử',
+                                style: AppTheme.bodyMedium.copyWith(
+                                  color: AppTheme.primaryColor,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                         
                         // Show multiple items detected
                         if (_detections.length > 1)
@@ -392,7 +385,7 @@ class _ResultScreenState extends State<ResultScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            '+${result.points} điểm',
+                            result.label,
                             style: AppTheme.bodySmall.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,

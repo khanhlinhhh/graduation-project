@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../app_theme.dart';
+import '../../services/collection_point_service.dart';
 
 class CollectionPointsScreen extends StatefulWidget {
   const CollectionPointsScreen({super.key});
@@ -10,6 +11,7 @@ class CollectionPointsScreen extends StatefulWidget {
 }
 
 class _CollectionPointsScreenState extends State<CollectionPointsScreen> {
+  final CollectionPointService _service = CollectionPointService();
   String _selectedCategory = 'Tất cả';
   
   final List<String> _categories = [
@@ -21,76 +23,11 @@ class _CollectionPointsScreenState extends State<CollectionPointsScreen> {
     'Pin/Điện tử',
   ];
 
-  final List<CollectionPoint> _collectionPoints = [
-    CollectionPoint(
-      id: '1',
-      name: 'Điểm thu gom Quận 1',
-      address: '123 Nguyễn Huệ, Quận 1, TP.HCM',
-      distance: 0.5,
-      categories: ['Nhựa', 'Giấy', 'Kim loại'],
-      openTime: '07:00 - 18:00',
-      phone: '0901234567',
-      rating: 4.5,
-      latitude: 10.7731,
-      longitude: 106.7030,
-    ),
-    CollectionPoint(
-      id: '2',
-      name: 'Trung tâm tái chế Xanh',
-      address: '456 Lê Lợi, Quận 3, TP.HCM',
-      distance: 1.2,
-      categories: ['Nhựa', 'Thủy tinh', 'Pin/Điện tử'],
-      openTime: '08:00 - 20:00',
-      phone: '0907654321',
-      rating: 4.8,
-      latitude: 10.7756,
-      longitude: 106.6922,
-    ),
-    CollectionPoint(
-      id: '3',
-      name: 'Điểm thu gom Eco Life',
-      address: '789 Võ Văn Tần, Quận 3, TP.HCM',
-      distance: 2.0,
-      categories: ['Giấy', 'Kim loại', 'Thủy tinh'],
-      openTime: '06:00 - 22:00',
-      phone: '0912345678',
-      rating: 4.2,
-      latitude: 10.7721,
-      longitude: 106.6856,
-    ),
-    CollectionPoint(
-      id: '4',
-      name: 'Siêu thị tái chế Go Green',
-      address: '321 Cách Mạng Tháng 8, Quận 10, TP.HCM',
-      distance: 3.5,
-      categories: ['Nhựa', 'Giấy', 'Kim loại', 'Thủy tinh'],
-      openTime: '07:00 - 21:00',
-      phone: '0923456789',
-      rating: 4.6,
-      latitude: 10.7725,
-      longitude: 106.6665,
-    ),
-    CollectionPoint(
-      id: '5',
-      name: 'Điểm thu gom Pin điện tử',
-      address: '555 Điện Biên Phủ, Quận Bình Thạnh, TP.HCM',
-      distance: 4.2,
-      categories: ['Pin/Điện tử'],
-      openTime: '08:00 - 17:00',
-      phone: '0934567890',
-      rating: 4.4,
-      latitude: 10.8012,
-      longitude: 106.7109,
-    ),
-  ];
-
-  List<CollectionPoint> get filteredPoints {
-    if (_selectedCategory == 'Tất cả') {
-      return _collectionPoints;
-    }
-    return _collectionPoints
-        .where((point) => point.categories.contains(_selectedCategory))
-        .toList();
+  @override
+  void initState() {
+    super.initState();
+    // Tự động thêm dữ liệu mẫu nếu chưa có
+    // _service.seedDefaultData(); // Đã tắt sau khi seed xong
   }
 
   @override
@@ -107,111 +44,137 @@ class _CollectionPointsScreenState extends State<CollectionPointsScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Column(
-        children: [
-          // Header with gradient
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-            decoration: const BoxDecoration(
-              color: AppTheme.primaryColor,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(24),
-                bottomRight: Radius.circular(24),
-              ),
-            ),
-            child: Column(
-              children: [
-                // Search bar
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Tìm kiếm điểm thu gom...',
-                      border: InputBorder.none,
-                      icon: Icon(Icons.search, color: AppTheme.textSecondary),
-                    ),
+      body: StreamBuilder<List<CollectionPoint>>(
+        stream: _service.getCollectionPointsStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Đã xảy ra lỗi: ${snapshot.error}'));
+          }
+
+          final allPoints = snapshot.data ?? [];
+          final filteredPoints = _selectedCategory == 'Tất cả'
+              ? allPoints
+              : allPoints.where((p) => p.categories.contains(_selectedCategory)).toList();
+
+          return Column(
+            children: [
+              // Header with gradient
+              Container(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                decoration: const BoxDecoration(
+                  color: AppTheme.primaryColor,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(24),
+                    bottomRight: Radius.circular(24),
                   ),
                 ),
-                const SizedBox(height: 16),
-                // Category filter
-                SizedBox(
-                  height: 36,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _categories.length,
-                    itemBuilder: (context, index) {
-                      final category = _categories[index];
-                      final isSelected = category == _selectedCategory;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: FilterChip(
-                          label: Text(
-                            category,
-                            style: TextStyle(
-                              color: isSelected ? Colors.white : AppTheme.textPrimary,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                            ),
-                          ),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            setState(() {
-                              _selectedCategory = category;
-                            });
-                          },
-                          backgroundColor: Colors.white,
-                          selectedColor: AppTheme.primaryColor,
-                          checkmarkColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Column(
+                  children: [
+                    // Search bar
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Tìm kiếm điểm thu gom...',
+                          border: InputBorder.none,
+                          icon: Icon(Icons.search, color: AppTheme.textSecondary),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Category filter
+                    SizedBox(
+                      height: 36,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _categories.length,
+                        itemBuilder: (context, index) {
+                          final category = _categories[index];
+                          final isSelected = category == _selectedCategory;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: FilterChip(
+                              label: Text(
+                                category,
+                                style: TextStyle(
+                                  color: isSelected ? Colors.white : AppTheme.textPrimary,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                ),
+                              ),
+                              selected: isSelected,
+                              onSelected: (selected) {
+                                setState(() {
+                                  _selectedCategory = category;
+                                });
+                              },
+                              backgroundColor: Colors.white,
+                              selectedColor: AppTheme.primaryColor,
+                              checkmarkColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          
-          // Results count
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Text(
-                  'Tìm thấy ${filteredPoints.length} điểm thu gom',
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: AppTheme.textSecondary,
-                  ),
+              ),
+              
+              // Results count
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Text(
+                      'Tìm thấy ${filteredPoints.length} điểm thu gom',
+                      style: AppTheme.bodyMedium.copyWith(
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                    const Spacer(),
+                    TextButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.map_outlined, size: 18),
+                      label: const Text('Bản đồ'),
+                    ),
+                  ],
                 ),
-                const Spacer(),
-                TextButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.map_outlined, size: 18),
-                  label: const Text('Bản đồ'),
-                ),
-              ],
-            ),
-          ),
-          
-          // Collection points list
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: filteredPoints.length,
-              itemBuilder: (context, index) {
-                final point = filteredPoints[index];
-                return _CollectionPointCard(point: point);
-              },
-            ),
-          ),
-        ],
+              ),
+              
+              // Collection points list
+              Expanded(
+                child: filteredPoints.isEmpty 
+                  ? Center(
+                      child: Text(
+                        'Không tìm thấy điểm thu gom nào',
+                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: filteredPoints.length,
+                      itemBuilder: (context, index) {
+                        final point = filteredPoints[index];
+                        return _CollectionPointCard(point: point);
+                      },
+                    ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 }
+
 
 class _CollectionPointCard extends StatelessWidget {
   final CollectionPoint point;

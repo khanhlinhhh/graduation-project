@@ -8,6 +8,7 @@ class TipModel {
   final String category;
   final Color categoryColor;
   final List<String> steps;
+  final String icon; // Emoji icon từ Firebase
 
   const TipModel({
     required this.id,
@@ -17,6 +18,7 @@ class TipModel {
     required this.category,
     required this.categoryColor,
     this.steps = const [],
+    this.icon = '♻️',
   });
 }
 

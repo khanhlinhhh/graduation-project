@@ -160,7 +160,17 @@ class _CameraScreenState extends State<CameraScreen>
       return;
     }
 
-    // Always capture a new photo and detect - more accurate than real-time detection
+    // Nếu đã có detection từ real-time, sử dụng kết quả đó luôn
+    if (_detections.isNotEmpty) {
+      Navigator.pushNamed(
+        context, 
+        '/result',
+        arguments: _detections,
+      );
+      return;
+    }
+
+    // Nếu chưa có detection, chụp ảnh và phân loại
     setState(() => _isScanning = true);
     _detectionTimer?.cancel();
 
@@ -176,12 +186,11 @@ class _CameraScreenState extends State<CameraScreen>
       final width = frame.image.width;
       final height = frame.image.height;
       
-      // Run detection on captured image (more accurate)
+      // Run detection on captured image
       final detections = await _classifierService.detectOnImage(bytes, width, height);
 
       if (mounted) {
         if (detections.isNotEmpty) {
-          // Navigate to result screen with all detections
           Navigator.pushNamed(
             context, 
             '/result',

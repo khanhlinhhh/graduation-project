@@ -37,7 +37,7 @@ class UserService {
         'email': user.email ?? '',
         'displayName': user.displayName ?? 'Người dùng',
         'avatarUrl': user.photoURL,
-        'greenPoints': 1000,
+        'greenPoints': 0,
         'scanCount': 0,
         'rewardCount': 0,
         'createdAt': FieldValue.serverTimestamp(),

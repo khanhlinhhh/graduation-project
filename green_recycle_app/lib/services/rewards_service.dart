@@ -240,7 +240,7 @@ class RewardsService {
       final data = doc.data();
       if (data != null && !data.containsKey('greenPoints')) {
         await _firestore.collection('users').doc(uid).update({
-          'greenPoints': 1000, // Give new users 1000 starting points
+          'greenPoints': 0, // New users start with 0 points
         });
       }
     }
