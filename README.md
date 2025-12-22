@@ -1,10 +1,6 @@
 # 🌿 Green Recycle - Hệ thống Phân loại Rác Thông minh
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.10.3+-02569B?logo=flutter&logoColor=white)](https://flutter.dev/)
-[![React](https://img.shields.io/badge/React-19.2.0-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![Firebase](https://img.shields.io/badge/Firebase-12.7.0-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com/)
-[![Gemini](https://img.shields.io/badge/Gemini-AI-4285F4?logo=google&logoColor=white)](https://ai.google.dev/)
-[![YOLOv11](https://img.shields.io/badge/YOLOv11-TFLite-00FFFF?logo=tensorflow&logoColor=white)](https://github.com/ultralytics/ultralytics)
+
 
 > **Đồ án tốt nghiệp**: Hệ thống phân loại rác tái chế thông minh sử dụng AI và Deep Learning
 
@@ -778,12 +774,7 @@ Dự án này được phát triển cho mục đích học tập và đồ án 
 
 ---
 
-## 📞 Liên hệ & Hỗ trợ
 
-Nếu bạn gặp vấn đề hoặc có câu hỏi:
-- 🐛 Báo lỗi: [GitHub Issues](https://github.com/your-repo/issues)
-- 💬 Thảo luận: [GitHub Discussions](https://github.com/your-repo/discussions)
-- 📧 Email trực tiếp: your.email@example.com
 
 ---
 
