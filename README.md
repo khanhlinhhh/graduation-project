@@ -754,10 +754,8 @@ Dự án này được phát triển cho mục đích học tập và đồ án 
 
 ## 👥 Tác giả
 
-**[Tên của bạn]**
-- Email: your.email@example.com
-- GitHub: [@yourhandle](https://github.com/yourhandle)
-
+**[Nguyễn Khánh Linh]**
+- Email: linhnk.21it@vku.udn.vn
 ---
 
 ## 🙏 Credits & Acknowledgments
