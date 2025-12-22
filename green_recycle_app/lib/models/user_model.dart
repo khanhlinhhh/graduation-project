@@ -10,6 +10,7 @@ class UserModel {
   final int rewardCount;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final bool isAdmin;
   // Check-in fields
   final DateTime? lastCheckInDate;
   final int checkInStreak;
@@ -25,6 +26,7 @@ class UserModel {
     this.rewardCount = 0,
     this.createdAt,
     this.updatedAt,
+    this.isAdmin = false,
     this.lastCheckInDate,
     this.checkInStreak = 0,
     this.totalCheckIns = 0,
@@ -42,6 +44,7 @@ class UserModel {
       rewardCount: map['rewardCount'] ?? 0,
       createdAt: (map['createdAt'] as Timestamp?)?.toDate(),
       updatedAt: (map['updatedAt'] as Timestamp?)?.toDate(),
+      isAdmin: map['isAdmin'] ?? false,
       lastCheckInDate: (map['lastCheckInDate'] as Timestamp?)?.toDate(),
       checkInStreak: map['checkInStreak'] ?? 0,
       totalCheckIns: map['totalCheckIns'] ?? 0,
@@ -60,6 +63,7 @@ class UserModel {
       'rewardCount': rewardCount,
       'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
+      'isAdmin': isAdmin,
       'lastCheckInDate': lastCheckInDate != null ? Timestamp.fromDate(lastCheckInDate!) : null,
       'checkInStreak': checkInStreak,
       'totalCheckIns': totalCheckIns,
@@ -82,6 +86,7 @@ class UserModel {
     int? rewardCount,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? isAdmin,
     DateTime? lastCheckInDate,
     int? checkInStreak,
     int? totalCheckIns,
@@ -96,6 +101,7 @@ class UserModel {
       rewardCount: rewardCount ?? this.rewardCount,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isAdmin: isAdmin ?? this.isAdmin,
       lastCheckInDate: lastCheckInDate ?? this.lastCheckInDate,
       checkInStreak: checkInStreak ?? this.checkInStreak,
       totalCheckIns: totalCheckIns ?? this.totalCheckIns,

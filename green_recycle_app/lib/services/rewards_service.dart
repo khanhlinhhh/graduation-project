@@ -119,7 +119,7 @@ class RewardsService {
         id: 'but_bi',
         name: 'Bút bi tái chế',
         description: 'Bút bi làm từ nhựa tái chế, thân thiện môi trường',
-        points: 100,
+        points: 4000,
         emoji: '🖊️',
         colorHex: '#5C6BC0',
       ),
@@ -127,7 +127,7 @@ class RewardsService {
         id: 'vo_tai_che',
         name: 'Vở tái chế',
         description: 'Vở 96 trang làm từ giấy tái chế 100%',
-        points: 200,
+        points: 35000,
         emoji: '📓',
         colorHex: '#AB47BC',
       ),
@@ -135,7 +135,7 @@ class RewardsService {
         id: 'hat_giong',
         name: 'Hạt giống rau',
         description: 'Bộ hạt giống rau sạch: cải, xà lách, rau muống',
-        points: 300,
+        points: 3000,
         emoji: '🌱',
         colorHex: '#66BB6A',
       ),
@@ -143,7 +143,7 @@ class RewardsService {
         id: 'so_tay',
         name: 'Sổ tay tái chế',
         description: 'Sổ tay bìa cứng làm từ bìa carton tái chế',
-        points: 400,
+        points: 40000,
         emoji: '📔',
         colorHex: '#FFB74D',
       ),
@@ -151,7 +151,7 @@ class RewardsService {
         id: 'tui_rac',
         name: 'Túi rác phân hủy',
         description: 'Túi rác tự phân hủy sinh học, gói 50 túi',
-        points: 500,
+        points: 5000,
         emoji: '♻️',
         colorHex: '#26C6DA',
       ),
@@ -159,7 +159,7 @@ class RewardsService {
         id: 'cay_canh',
         name: 'Cây cảnh mini',
         description: 'Cây sen đá hoặc xương rồng mini trong chậu tái chế',
-        points: 800,
+        points: 5000,
         emoji: '🌵',
         colorHex: '#81C784',
       ),
@@ -216,17 +216,30 @@ class RewardsService {
     final uid = currentUserId;
     if (uid == null) return Stream.value([]);
 
+    // Remove orderBy to avoid requiring a Firebase composite index
+    // We'll sort client-side instead
     return _firestore
         .collection('redemptions')
         .where('userId', isEqualTo: uid)
-        .orderBy('redeemedAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
+      final items = snapshot.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id;
         return data;
       }).toList();
+      
+      // Sort client-side by redeemedAt (newest first)
+      items.sort((a, b) {
+        final aTime = a['redeemedAt'] as Timestamp?;
+        final bTime = b['redeemedAt'] as Timestamp?;
+        if (aTime == null && bTime == null) return 0;
+        if (aTime == null) return 1;
+        if (bTime == null) return -1;
+        return bTime.compareTo(aTime);
+      });
+      
+      return items;
     });
   }
 

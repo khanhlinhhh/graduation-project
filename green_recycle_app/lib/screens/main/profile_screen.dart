@@ -4,6 +4,7 @@ import '../../app_theme.dart';
 import '../../services/user_service.dart';
 import '../../models/user_model.dart';
 import '../../providers/settings_provider.dart';
+import '../../services/notification_service.dart';
 import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -241,13 +242,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               secondaryTextColor: secondaryTextColor,
                               onTap: _navigateToEditProfile,
                             ),
-                            _buildMenuItem(
-                              icon: Icons.notifications_outlined,
-                              title: settings.tr('notifications'),
-                              cardColor: cardColor,
-                              textColor: textColor,
-                              secondaryTextColor: secondaryTextColor,
-                              onTap: () {},
+                            // Notifications with badge
+                            StreamBuilder<int>(
+                              stream: NotificationService().getUnreadCountStream(),
+                              builder: (context, snapshot) {
+                                final unreadCount = snapshot.data ?? 0;
+                                return _buildMenuItem(
+                                  icon: Icons.notifications_outlined,
+                                  title: settings.tr('notifications'),
+                                  cardColor: cardColor,
+                                  textColor: textColor,
+                                  secondaryTextColor: secondaryTextColor,
+                                  trailing: unreadCount > 0
+                                      ? Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: Colors.red,
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              child: Text(
+                                                unreadCount > 99 ? '99+' : '$unreadCount',
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Icon(
+                                              Icons.arrow_forward_ios,
+                                              size: 16,
+                                              color: secondaryTextColor,
+                                            ),
+                                          ],
+                                        )
+                                      : null,
+                                  onTap: () => Navigator.pushNamed(context, '/notifications'),
+                                );
+                              },
                             ),
                             _buildMenuItem(
                               icon: Icons.language,
@@ -297,7 +333,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               cardColor: cardColor,
                               textColor: textColor,
                               secondaryTextColor: secondaryTextColor,
-                              onTap: () {},
+                              onTap: () => Navigator.pushNamed(context, '/help-support'),
                             ),
                           ],
                         ),

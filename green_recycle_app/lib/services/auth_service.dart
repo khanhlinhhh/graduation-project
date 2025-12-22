@@ -103,7 +103,6 @@ class AuthService {
     }
   }
 
-  // Save user data to Firestore
   Future<void> _saveUserToFirestore({
     required String uid,
     required String email,
@@ -116,6 +115,7 @@ class AuthService {
       'avatarUrl': null,
       'greenPoints': 0, // Initial green points for new users
       'scanCount': 0,
+      'isAdmin': false, // New users are not admins by default
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });

@@ -184,7 +184,7 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
             ),
           ),
           IconButton(
-            onPressed: () => Navigator.pushNamed(context, '/history'),
+            onPressed: () => Navigator.pushNamed(context, '/redemption-history'),
             icon: const Icon(Icons.history, color: Colors.white),
           ),
         ],
@@ -453,11 +453,18 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
     setState(() => _isCheckingIn = false);
     
     if (result['success'] == true) {
-      // Show success animation/dialog
-      _showCheckInSuccessDialog(
-        result['pointsEarned'] ?? 0,
-        result['newStreak'] ?? 1,
-      );
+      final pointsEarned = result['pointsEarned'] ?? 0;
+      final newStreak = result['newStreak'] ?? 1;
+      
+      // Show animated notification banner first
+      _showPointsNotification(pointsEarned);
+      
+      // Then show success dialog after a short delay
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (mounted) {
+          _showCheckInSuccessDialog(pointsEarned, newStreak);
+        }
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -469,6 +476,76 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
         ),
       );
     }
+  }
+
+  void _showPointsNotification(int points) {
+    final overlay = Overlay.of(context);
+    late OverlayEntry overlayEntry;
+    
+    overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 20,
+        left: 20,
+        right: 20,
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.0, end: 1.0),
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.elasticOut,
+          builder: (context, value, child) {
+            return Transform.scale(
+              scale: value,
+              child: Opacity(
+                opacity: value,
+                child: child,
+              ),
+            );
+          },
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.eco, color: Colors.white, size: 28),
+                  const SizedBox(width: 12),
+                  Text(
+                    '+$points điểm xanh',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text('🎉', style: TextStyle(fontSize: 24)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    
+    overlay.insert(overlayEntry);
+    
+    // Remove notification after 2 seconds
+    Future.delayed(const Duration(seconds: 2), () {
+      overlayEntry.remove();
+    });
   }
 
   void _showCheckInSuccessDialog(int points, int streak) {

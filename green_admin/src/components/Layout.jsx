@@ -8,7 +8,8 @@ import {
     CalendarCheck,
     Lightbulb,
     LogOut,
-    Leaf
+    Leaf,
+    MapPin
 } from 'lucide-react';
 
 const navItems = [
@@ -17,6 +18,7 @@ const navItems = [
     { path: '/rewards', icon: Gift, label: 'Phần thưởng' },
     { path: '/checkins', icon: CalendarCheck, label: 'Check-ins' },
     { path: '/tips', icon: Lightbulb, label: 'Mẹo xanh' },
+    { path: '/collection-points', icon: MapPin, label: 'Điểm thu gom' },
 ];
 
 export default function Layout({ children }) {

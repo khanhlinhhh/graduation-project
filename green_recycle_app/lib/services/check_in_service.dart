@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'notification_service.dart';
 
 class CheckInService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final NotificationService _notificationService = NotificationService();
 
   String? get currentUserId => _auth.currentUser?.uid;
 
@@ -144,6 +146,17 @@ class CheckInService {
         'streakDay': currentStreak,
         'timestamp': FieldValue.serverTimestamp(),
       });
+
+      // Create notification
+      await _notificationService.createNotification(
+        title: 'Check-in thành công! 🎉',
+        message: 'Bạn đã nhận $pointsEarned điểm xanh. Chuỗi: $currentStreak ngày',
+        type: 'check-in',
+        data: {
+          'points': pointsEarned,
+          'streak': currentStreak,
+        },
+      );
 
       return {
         'success': true,
