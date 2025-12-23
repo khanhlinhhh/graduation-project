@@ -230,21 +230,8 @@ export default function Users() {
                                         >
                                             <Eye className="w-4 h-4" />
                                         </button>
-                                        <button
-                                            onClick={() => setPointsModal({ open: true, user, action: 'add' })}
-                                            className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                            title="Thêm điểm"
-                                        >
-                                            <Plus className="w-4 h-4" />
-                                        </button>
-                                        <button
-                                            onClick={() => setPointsModal({ open: true, user, action: 'subtract' })}
-                                            className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                                            title="Trừ điểm"
-                                        >
-                                            <Minus className="w-4 h-4" />
-                                        </button>
-                                        <div className="w-px h-6 bg-gray-200 mx-1"></div>
+
+
                                         <button
                                             onClick={() => setEditModal({ open: true, user })}
                                             className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"

@@ -16,13 +16,17 @@ class NotificationService {
     return _firestore
         .collection('notifications')
         .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
         .limit(50)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs
+      final notifications = snapshot.docs
           .map((doc) => NotificationModel.fromMap(doc.id, doc.data()))
           .toList();
+      
+      // Sort in-memory by createdAt (newest first)
+      notifications.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      
+      return notifications;
     });
   }
 

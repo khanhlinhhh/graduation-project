@@ -6,6 +6,7 @@ import '../../models/user_model.dart';
 import '../../providers/settings_provider.dart';
 import '../../services/notification_service.dart';
 import 'edit_profile_screen.dart';
+import 'notifications_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -281,7 +282,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ],
                                         )
                                       : null,
-                                  onTap: () => Navigator.pushNamed(context, '/notifications'),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const NotificationsScreen(),
+                                      ),
+                                    );
+                                  },
                                 );
                               },
                             ),
