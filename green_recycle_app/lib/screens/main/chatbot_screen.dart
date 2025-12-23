@@ -34,6 +34,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   @override
   void initState() {
     super.initState();
+    
     // Add welcome message
     _messages.add(ChatMessage(
       text: 'Xin chào! 👋 Tôi là GreenBot, trợ lý tái chế của bạn. Hãy hỏi tôi bất cứ điều gì về phân loại rác và bảo vệ môi trường! 🌿',
@@ -238,7 +239,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                 ),
               ],
             ),
-            child: SafeArea(
+              child: SafeArea(
               child: Row(
                 children: [
                   Expanded(
@@ -246,11 +247,17 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                       decoration: BoxDecoration(
                         color: const Color(0xFFF5F5F5),
                         borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: AppTheme.primaryColor.withOpacity(0.1),
+                          width: 1,
+                        ),
                       ),
                       child: TextField(
                         controller: _messageController,
                         focusNode: _focusNode,
                         enabled: !_isLoading,
+                        maxLines: null,
+                        textInputAction: TextInputAction.send,
                         decoration: InputDecoration(
                           hintText: _isLoading ? 'AI đang trả lời...' : 'Nhập câu hỏi...',
                           border: InputBorder.none,
@@ -264,6 +271,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
+                  // Send button
                   Container(
                     decoration: BoxDecoration(
                       gradient: _isLoading 
