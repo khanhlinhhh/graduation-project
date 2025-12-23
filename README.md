@@ -723,17 +723,6 @@ firebase deploy --only hosting
 
 ---
 
-## 🤝 Đóng góp
-
-Mọi đóng góp đề xuất đều được hoan nghênh! 
-
-### Quy trình đóng góp:
-
-1. Fork repository
-2. Tạo branch mới (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Tạo Pull Request
 
 ### Coding Standards:
 - **Flutter**: Sử dụng `flutter analyze` và `dart format`
