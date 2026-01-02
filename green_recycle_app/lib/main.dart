@@ -11,6 +11,19 @@ import 'providers/settings_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
+  // Customize error widget to prevent red screen of death
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Center(
+        child: Text(
+          'Đã xảy ra lỗi',
+          style: TextStyle(color: Colors.grey[600]),
+        ),
+      ),
+    );
+  };
+  
   // Load environment variables (optional - may be empty)
   try {
     await dotenv.load(fileName: ".env");

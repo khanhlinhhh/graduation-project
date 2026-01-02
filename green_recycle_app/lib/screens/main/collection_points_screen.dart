@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../app_theme.dart';
 import '../../services/collection_point_service.dart';
 
@@ -13,6 +14,8 @@ class CollectionPointsScreen extends StatefulWidget {
 class _CollectionPointsScreenState extends State<CollectionPointsScreen> {
   final CollectionPointService _service = CollectionPointService();
   String _selectedCategory = 'Tất cả';
+  Position? _currentPosition;
+  bool _isLoadingLocation = false;
   
   final List<String> _categories = [
     'Tất cả',
@@ -26,8 +29,77 @@ class _CollectionPointsScreenState extends State<CollectionPointsScreen> {
   @override
   void initState() {
     super.initState();
-    // Tự động thêm dữ liệu mẫu nếu chưa có
-    // _service.seedDefaultData(); // Đã tắt sau khi seed xong
+    _getCurrentLocation();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    setState(() => _isLoadingLocation = true);
+    
+    try {
+      // Check if location services are enabled
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Vui lòng bật dịch vụ định vị')),
+          );
+        }
+        setState(() => _isLoadingLocation = false);
+        return;
+      }
+
+      // Check location permissions
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Quyền truy cập vị trí bị từ chối')),
+            );
+          }
+          setState(() => _isLoadingLocation = false);
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Vui lòng cấp quyền vị trí trong Cài đặt')),
+          );
+        }
+        setState(() => _isLoadingLocation = false);
+        return;
+      }
+
+      // Get current position
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      setState(() {
+        _currentPosition = position;
+        _isLoadingLocation = false;
+      });
+    } catch (e) {
+      debugPrint('Error getting location: $e');
+      setState(() => _isLoadingLocation = false);
+    }
+  }
+
+  double _calculateDistance(double lat, double lon) {
+    if (_currentPosition == null) return 0.0;
+    
+    // Calculate distance in meters, then convert to km
+    double distanceInMeters = Geolocator.distanceBetween(
+      _currentPosition!.latitude,
+      _currentPosition!.longitude,
+      lat,
+      lon,
+    );
+    
+    return distanceInMeters / 1000; // Convert to km
   }
 
   @override
@@ -56,9 +128,30 @@ class _CollectionPointsScreenState extends State<CollectionPointsScreen> {
           }
 
           final allPoints = snapshot.data ?? [];
+          
+          // Calculate distances and update points
+          final pointsWithDistance = allPoints.map((p) {
+            final distance = _calculateDistance(p.latitude, p.longitude);
+            return CollectionPoint(
+              id: p.id,
+              name: p.name,
+              address: p.address,
+              distance: distance,
+              categories: p.categories,
+              openTime: p.openTime,
+              phone: p.phone,
+              rating: p.rating,
+              latitude: p.latitude,
+              longitude: p.longitude,
+            );
+          }).toList();
+          
+          // Sort by distance (nearest first)
+          pointsWithDistance.sort((a, b) => a.distance.compareTo(b.distance));
+          
           final filteredPoints = _selectedCategory == 'Tất cả'
-              ? allPoints
-              : allPoints.where((p) => p.categories.contains(_selectedCategory)).toList();
+              ? pointsWithDistance
+              : pointsWithDistance.where((p) => p.categories.contains(_selectedCategory)).toList();
 
           return Column(
             children: [
@@ -253,7 +346,9 @@ class _CollectionPointCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                '${point.distance} km',
+                                point.distance > 0 
+                                  ? '${point.distance.toStringAsFixed(1)} km'
+                                  : 'Đang tính...',
                                 style: AppTheme.bodySmall.copyWith(
                                   color: AppTheme.textSecondary,
                                 ),

@@ -64,16 +64,29 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
       body: StreamBuilder<int>(
         stream: _rewardsService.getUserPointsStream(),
         builder: (context, pointsSnapshot) {
+          // Handle error state to prevent red screen
+          if (pointsSnapshot.hasError) {
+            debugPrint('Points Stream Error: ${pointsSnapshot.error}');
+          }
           final currentPoints = pointsSnapshot.data ?? 0;
           
           return StreamBuilder<List<RewardModel>>(
             stream: _rewardsService.getRewardsStream(),
             builder: (context, rewardsSnapshot) {
+              // Handle error state to prevent red screen
+              if (rewardsSnapshot.hasError) {
+                debugPrint('Rewards Stream Error: ${rewardsSnapshot.error}');
+              }
               final rewards = rewardsSnapshot.data ?? [];
               
               return StreamBuilder<Map<String, dynamic>>(
                 stream: _checkInService.getCheckInInfoStream(),
                 builder: (context, checkInSnapshot) {
+                  // Handle error state to prevent red screen
+                  if (checkInSnapshot.hasError) {
+                    debugPrint('CheckIn Stream Error: ${checkInSnapshot.error}');
+                  }
+                  
                   final checkInInfo = checkInSnapshot.data ?? {
                     'streak': 0,
                     'canCheckIn': true,
@@ -479,73 +492,85 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
   }
 
   void _showPointsNotification(int points) {
-    final overlay = Overlay.of(context);
-    late OverlayEntry overlayEntry;
+    if (!mounted) return;
     
-    overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: MediaQuery.of(context).padding.top + 20,
-        left: 20,
-        right: 20,
-        child: TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0.0, end: 1.0),
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.elasticOut,
-          builder: (context, value, child) {
-            return Transform.scale(
-              scale: value,
-              child: Opacity(
-                opacity: value,
-                child: child,
-              ),
-            );
-          },
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+    try {
+      final overlay = Overlay.of(context);
+      late OverlayEntry overlayEntry;
+      
+      overlayEntry = OverlayEntry(
+        builder: (context) => Positioned(
+          top: MediaQuery.of(context).padding.top + 20,
+          left: 20,
+          right: 20,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.elasticOut,
+            builder: (context, value, child) {
+              // Clamp opacity to valid range (0.0 - 1.0) since elasticOut can overshoot
+              final clampedOpacity = value.clamp(0.0, 1.0);
+              return Transform.scale(
+                scale: value,
+                child: Opacity(
+                  opacity: clampedOpacity,
+                  child: child,
                 ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
+              );
+            },
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF4CAF50), Color(0xFF2E7D32)],
                   ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.eco, color: Colors.white, size: 28),
-                  const SizedBox(width: 12),
-                  Text(
-                    '+$points điểm xanh',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text('🎉', style: TextStyle(fontSize: 24)),
-                ],
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.eco, color: Colors.white, size: 28),
+                    const SizedBox(width: 12),
+                    Text(
+                      '+$points điểm xanh',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('🎉', style: TextStyle(fontSize: 24)),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ),
-    );
-    
-    overlay.insert(overlayEntry);
-    
-    // Remove notification after 2 seconds
-    Future.delayed(const Duration(seconds: 2), () {
-      overlayEntry.remove();
-    });
+      );
+      
+      overlay.insert(overlayEntry);
+      
+      // Remove notification after 2 seconds
+      Future.delayed(const Duration(seconds: 2), () {
+        try {
+          overlayEntry.remove();
+        } catch (e) {
+          // Ignore if already removed
+        }
+      });
+    } catch (e) {
+      debugPrint('Error showing points notification: $e');
+    }
   }
 
   void _showCheckInSuccessDialog(int points, int streak) {

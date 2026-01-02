@@ -30,6 +30,9 @@ dependencies:
   # URL Launcher for maps
   url_launcher: ^6.2.5
   
+  # Geolocator for location services
+  geolocator: ^13.0.2
+  
   # Gemini AI for chatbot (HTTP calls)
   http: ^1.2.0
   

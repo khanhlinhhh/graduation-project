@@ -122,4 +122,32 @@ class HistoryService {
     final history = await getUserHistory(limit: 1000);
     return history.fold<int>(0, (sum, item) => sum + item.pointsEarned);
   }
+
+  /// Get total scan count for current user
+  Future<int> getTotalScanCount() async {
+    final userId = _currentUserId;
+    if (userId == null) return 0;
+
+    try {
+      final snapshot = await _historyCollection
+          .where('userId', isEqualTo: userId)
+          .get();
+      
+      return snapshot.docs.length;
+    } catch (e) {
+      debugPrint('HistoryService: Error getting scan count: $e');
+      return 0;
+    }
+  }
+
+  /// Stream for total scan count (real-time)
+  Stream<int> getTotalScanCountStream() {
+    final userId = _currentUserId;
+    if (userId == null) return Stream.value(0);
+
+    return _historyCollection
+        .where('userId', isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
+  }
 }

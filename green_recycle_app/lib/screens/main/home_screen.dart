@@ -61,7 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
             final user = snapshot.data;
             final displayName = user?.displayName ?? 'Green User';
             final greenPoints = user?.greenPoints ?? 0;
-            final scanCount = user?.scanCount ?? 0;
             final rewardCount = user?.rewardCount ?? 0;
             final avatarUrl = user?.avatarUrl;
 
@@ -207,17 +206,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            _buildStatItem(scanCount.toString(), 'Lần quét', Icons.qr_code_scanner),
-                            Container(
-                              width: 1,
-                              height: 40,
-                              color: Colors.white.withOpacity(0.3),
-                            ),
-                            _buildStatItem(rewardCount.toString(), 'Đổi thưởng', Icons.card_giftcard),
-                          ],
+                        // Use StreamBuilder for scan count from history
+                        StreamBuilder<int>(
+                          stream: _historyService.getTotalScanCountStream(),
+                          builder: (context, scanSnapshot) {
+                            final scanCount = scanSnapshot.data ?? 0;
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _buildStatItem(scanCount.toString(), 'Lần quét', Icons.qr_code_scanner),
+                                Container(
+                                  width: 1,
+                                  height: 40,
+                                  color: Colors.white.withOpacity(0.3),
+                                ),
+                                _buildStatItem(rewardCount.toString(), 'Đổi thưởng', Icons.card_giftcard),
+                              ],
+                            );
+                          },
                         ),
                       ],
                     ),

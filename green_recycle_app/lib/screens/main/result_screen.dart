@@ -45,9 +45,9 @@ class _ResultScreenState extends State<ResultScreen> {
       }
       debugPrint('ResultScreen: All history saved');
 
-      // Chỉ tăng scan count, không cộng điểm
-      await _userService.incrementScanCount(uid);
-      debugPrint('ResultScreen: Scan count incremented');
+      // Scan count is now automatically calculated from classification_history
+      // No need to manually increment scanCount field
+      debugPrint('ResultScreen: Scan count will be updated automatically from history');
 
       if (mounted) {
         setState(() {

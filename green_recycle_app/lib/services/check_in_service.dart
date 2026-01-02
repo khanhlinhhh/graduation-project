@@ -233,6 +233,9 @@ class CheckInService {
         'totalCheckIns': totalCheckIns,
         'lastCheckIn': lastCheckIn,
       };
+    }).handleError((error) {
+      // Return default values on error to prevent red screen
+      return {'streak': 0, 'canCheckIn': true, 'nextPoints': 10, 'totalCheckIns': 0};
     });
   }
 }

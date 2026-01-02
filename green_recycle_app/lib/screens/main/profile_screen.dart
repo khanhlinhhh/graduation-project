@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../app_theme.dart';
 import '../../services/user_service.dart';
+import '../../services/history_service.dart';
 import '../../models/user_model.dart';
 import '../../providers/settings_provider.dart';
 import '../../services/notification_service.dart';
@@ -204,15 +205,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                             const SizedBox(width: 16),
+                            // Use StreamBuilder for scan count from history
                             Expanded(
-                              child: _buildStatCard(
-                                icon: Icons.qr_code_scanner,
-                                iconColor: AppTheme.accentColor,
-                                value: '${_user?.scanCount ?? 0}',
-                                label: settings.tr('scanCount'),
-                                cardColor: cardColor,
-                                textColor: textColor,
-                                secondaryTextColor: secondaryTextColor,
+                              child: StreamBuilder<int>(
+                                stream: HistoryService().getTotalScanCountStream(),
+                                builder: (context, scanSnapshot) {
+                                  final scanCount = scanSnapshot.data ?? 0;
+                                  return _buildStatCard(
+                                    icon: Icons.qr_code_scanner,
+                                    iconColor: AppTheme.accentColor,
+                                    value: '$scanCount',
+                                    label: settings.tr('scanCount'),
+                                    cardColor: cardColor,
+                                    textColor: textColor,
+                                    secondaryTextColor: secondaryTextColor,
+                                  );
+                                },
                               ),
                             ),
                           ],
