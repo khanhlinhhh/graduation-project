@@ -9,7 +9,8 @@ import {
     Lightbulb,
     LogOut,
     Leaf,
-    MapPin
+    MapPin,
+    Package
 } from 'lucide-react';
 
 const navItems = [
@@ -19,6 +20,7 @@ const navItems = [
     { path: '/checkins', icon: CalendarCheck, label: 'Check-ins' },
     { path: '/tips', icon: Lightbulb, label: 'Mẹo xanh' },
     { path: '/collection-points', icon: MapPin, label: 'Điểm thu gom' },
+    { path: '/waste-requests', icon: Package, label: 'Yêu cầu thu gom' },
 ];
 
 export default function Layout({ children }) {

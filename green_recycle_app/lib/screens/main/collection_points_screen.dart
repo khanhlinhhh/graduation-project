@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../app_theme.dart';
 import '../../services/collection_point_service.dart';
+import '../../services/waste_request_service.dart';
 
 class CollectionPointsScreen extends StatefulWidget {
   const CollectionPointsScreen({super.key});
@@ -561,6 +563,25 @@ class _CollectionPointCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 32),
                     
+                    // Request button - shows option selection
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _showRequestOptionDialog(context),
+                        icon: const Icon(Icons.add_task),
+                        label: const Text('Tạo yêu cầu thu gom'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    
                     // Action buttons
                     Row(
                       children: [
@@ -621,6 +642,471 @@ class _CollectionPointCard extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _showRequestOptionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'Chọn phương thức',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Pickup option
+            InkWell(
+              onTap: () {
+                Navigator.pop(context);
+                _showPickupRequestDialog(context);
+              },
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.local_shipping, color: Colors.blue),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Đến lấy',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Chúng tôi đến lấy tại địa chỉ của bạn',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Dropoff option
+            InkWell(
+              onTap: () {
+                Navigator.pop(context);
+                _showDropoffRequestDialog(context);
+              },
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.green.withOpacity(0.3)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.person_pin_circle, color: Colors.green),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Tự mang đến',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Bạn tự mang rác đến điểm thu gom',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Hủy'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPickupRequestDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.local_shipping, color: Colors.blue),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'Yêu cầu đến lấy',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          'Bạn có muốn để chúng tôi đến lấy rác tái chế của bạn không?',
+          style: TextStyle(fontSize: 15),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Không'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _showAddressInputDialog(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('Có'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDropoffRequestDialog(BuildContext context) {
+    DateTime? selectedDate;
+    TimeOfDay? selectedTime;
+    final WasteRequestService wasteRequestService = WasteRequestService();
+    bool isLoading = false;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.person_pin_circle, color: Colors.green),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Tự mang đến',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Chọn ngày giờ dự định mang rác đến:',
+                style: TextStyle(fontSize: 14),
+              ),
+              const SizedBox(height: 16),
+              // Date picker
+              OutlinedButton.icon(
+                onPressed: isLoading
+                    ? null
+                    : () async {
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime.now().add(const Duration(days: 30)),
+                        );
+                        if (date != null) {
+                          setState(() => selectedDate = date);
+                        }
+                      },
+                icon: const Icon(Icons.calendar_today),
+                label: Text(
+                  selectedDate != null
+                      ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
+                      : 'Chọn ngày',
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Time picker
+              OutlinedButton.icon(
+                onPressed: isLoading
+                    ? null
+                    : () async {
+                        final time = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (time != null) {
+                          setState(() => selectedTime = time);
+                        }
+                      },
+                icon: const Icon(Icons.access_time),
+                label: Text(
+                  selectedTime != null
+                      ? '${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}'
+                      : 'Chọn giờ',
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+              ),
+
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: isLoading ? null : () => Navigator.pop(context),
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: isLoading || selectedDate == null || selectedTime == null
+                  ? null
+                  : () async {
+                      setState(() => isLoading = true);
+
+                      try {
+                        // Combine date and time
+                        final scheduledDateTime = DateTime(
+                          selectedDate!.year,
+                          selectedDate!.month,
+                          selectedDate!.day,
+                          selectedTime!.hour,
+                          selectedTime!.minute,
+                        );
+
+                        // Create dropoff request
+                        await wasteRequestService.createDropoffRequest(
+                          wasteType: 'recyclable',
+                          wasteTypeLabel: 'Rác tái chế',
+                          confidence: 1.0,
+                          points: 50,
+                          collectionPointId: point.id,
+                          collectionPointName: point.name,
+                          scheduledTime: scheduledDateTime,
+                          notes: 'Yêu cầu tự mang đến điểm: ${point.name}',
+                        );
+
+                        if (context.mounted) {
+                          Navigator.pop(context); // Close dialog
+                          Navigator.pop(context); // Close bottom sheet
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('✅ Đã gửi yêu cầu! Chờ admin xác nhận.'),
+                              backgroundColor: Colors.green,
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          setState(() => isLoading = false);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('❌ Lỗi: ${e.toString()}'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Xác nhận'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAddressInputDialog(BuildContext context) {
+    final TextEditingController addressController = TextEditingController();
+    final WasteRequestService wasteRequestService = WasteRequestService();
+    bool isLoading = false;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Nhập địa chỉ của bạn'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: addressController,
+                decoration: InputDecoration(
+                  hintText: 'VD: 123 Đường ABC, Quận 1, TP.HCM',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: const Icon(Icons.location_on),
+                ),
+                maxLines: 2,
+                enabled: !isLoading,
+              ),
+
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: isLoading ? null : () => Navigator.pop(context),
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      final address = addressController.text.trim();
+                      if (address.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Vui lòng nhập địa chỉ'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      setState(() => isLoading = true);
+
+                      try {
+                        // Get current position for coordinates
+                        Position? position;
+                        try {
+                          position = await Geolocator.getCurrentPosition(
+                            desiredAccuracy: LocationAccuracy.high,
+                          );
+                        } catch (e) {
+                          // If location access fails, use default coordinates
+                          debugPrint('Could not get location: $e');
+                        }
+
+                        final coordinates = GeoPoint(
+                          position?.latitude ?? 10.8231, // Default to Ho Chi Minh City
+                          position?.longitude ?? 106.6297,
+                        );
+
+                        // Create pickup request
+                        await wasteRequestService.createPickupRequest(
+                          wasteType: 'recyclable',
+                          wasteTypeLabel: 'Rác tái chế',
+                          confidence: 1.0,
+                          points: 50,
+                          address: address,
+                          coordinates: coordinates,
+                          notes: 'Yêu cầu từ điểm thu gom: ${point.name}',
+                        );
+
+                        if (context.mounted) {
+                          Navigator.pop(context); // Close dialog
+                          Navigator.pop(context); // Close bottom sheet
+                          
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('✅ Đã gửi yêu cầu! Chờ admin xác nhận.'),
+                              backgroundColor: Colors.green,
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          setState(() => isLoading = false);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('❌ Lỗi: ${e.toString()}'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Xác nhận'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

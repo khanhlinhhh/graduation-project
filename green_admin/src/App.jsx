@@ -10,6 +10,7 @@ import Rewards from './pages/Rewards';
 import CheckIns from './pages/CheckIns';
 import Tips from './pages/Tips';
 import CollectionPoints from './pages/CollectionPoints';
+import WasteRequests from './pages/WasteRequests';
 import './index.css';
 
 function ProtectedRoute({ children }) {
@@ -56,6 +57,7 @@ function App() {
                   <Route path="/checkins" element={<CheckIns />} />
                   <Route path="/tips" element={<Tips />} />
                   <Route path="/collection-points" element={<CollectionPoints />} />
+                  <Route path="/waste-requests" element={<WasteRequests />} />
                 </Routes>
               </Layout>
             </ProtectedRoute>

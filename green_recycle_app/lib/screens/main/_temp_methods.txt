@@ -1,0 +1,239 @@
+  /// Build action section - different UI for recyclable vs other waste
+  Widget _buildActionSection() {
+    final hasRecyclable = _detections.any(
+      (d) => d.labelEn.toLowerCase().contains('recyclable'),
+    );
+
+    if (hasRecyclable && !_requestCreated) {
+      // RECYCLABLE WASTE: Show pickup/dropoff options
+      return Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.green.shade50,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.green.shade200),
+            ),
+            child: Column(
+              children: [
+                Icon(Icons.recycling, color: Colors.green.shade700, size: 32),
+                const SizedBox(height: 12),
+                Text(
+                  'Bạn có muốn chúng tôi đến lấy rác tái chế không?',
+                  style: AppTheme.headingSmall.copyWith(
+                    color: Colors.green.shade900,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Chọn phương thức để nhận ${_detections.first.points} điểm thưởng',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: Colors.grey.shade600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          CustomButton(
+            text: 'Có, đến lấy tại nhà',
+            icon: Icons.local_shipping,
+            onPressed: _handlePickupRequest,
+          ),
+          const SizedBox(height: 12),
+          CustomButton(
+            text: 'Không, tôi sẽ đem đến điểm thu gom',
+            icon: Icons.location_on,
+            isOutlined: true,
+            onPressed: _handleDropoffRequest,
+          ),
+        ],
+      );
+    } else if (hasRecyclable && _requestCreated) {
+      // Success message
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.primaryColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppTheme.primaryColor.withOpacity(0.3)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.check_circle, color: AppTheme.primaryColor),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Yêu cầu đã được gửi. Bạn sẽ nhận thông báo khi admin xác nhận.',
+                style: AppTheme.bodyMedium.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.primaryColor,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      // OTHER WASTE: Just collection points link
+      return GestureDetector(
+        onTap: () => Navigator.pushNamed(context, '/collection-points'),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.location_on, color: Colors.grey.shade600),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Điểm thu gom gần nhất',
+                      style: AppTheme.bodyMedium.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'Xem danh sách điểm thu gom',
+                      style: AppTheme.bodySmall.copyWith(
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey.shade400),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  /// Handle pickup request
+  Future<void> _handlePickupRequest() async {
+    final addressController = TextEditingController();
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Nhập địa chỉ'),
+        content: TextField(
+          controller: addressController,
+          decoration: const InputDecoration(
+            hintText: 'Ví dụ: 123 Nguyễn Văn A, Quận 1',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 2,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Xác nhận'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && addressController.text.isNotEmpty) {
+      try {
+        final recyclable = _detections.firstWhere(
+          (d) => d.labelEn.toLowerCase().contains('recyclable'),
+        );
+
+        await _wasteRequestService.createPickupRequest(
+          wasteType: 'recyclable',
+          wasteTypeLabel: recyclable.label,
+          confidence: recyclable.confidence,
+          points: recyclable.points,
+          address: addressController.text,
+          coordinates: const GeoPoint(0, 0),
+          notes: 'Yêu cầu đến lấy rác tái chế',
+        );
+
+        setState(() => _requestCreated = true);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✅ Yêu cầu đã được gửi! Chờ admin xác nhận.'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Lỗi: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  /// Handle dropoff request
+  Future<void> _handleDropoffRequest() async {
+    final selectedPoint = await Navigator.push<CollectionPoint>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CollectionPointsScreen(selectMode: true),
+      ),
+    );
+
+    if (selectedPoint != null) {
+      try {
+        final recyclable = _detections.firstWhere(
+          (d) => d.labelEn.toLowerCase().contains('recyclable'),
+        );
+
+        await _wasteRequestService.createDropoffRequest(
+          wasteType: 'recyclable',
+          wasteTypeLabel: recyclable.label,
+          confidence: recyclable.confidence,
+          points: recyclable.points,
+          collectionPointId: selectedPoint.id,
+          collectionPointName: selectedPoint.name,
+          notes: 'Sẽ đem rác đến điểm thu gom',
+        );
+
+        setState(() => _requestCreated = true);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '✅ Đã chọn: ${selectedPoint.name}. Đem rác đến đây để nhận điểm!',
+              ),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Lỗi: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
